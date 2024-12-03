@@ -1,0 +1,16 @@
+{
+    "name": "ScenarioFlow.Scripts",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5df09d124d9a871458b5a26fa57a4677"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

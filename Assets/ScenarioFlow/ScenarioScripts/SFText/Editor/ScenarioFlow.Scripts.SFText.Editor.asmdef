@@ -1,0 +1,21 @@
+{
+    "name": "ScenarioFlow.Scripts.SFText.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5df09d124d9a871458b5a26fa57a4677",
+        "GUID:2c196fce1ea802d498a78d46f23fcb7a",
+        "GUID:8ee40603af27f0f48ad6bd40bfcb0ebd",
+        "GUID:1bbb6503fe0d2cc44ab51b8d3541d34f",
+        "GUID:6bf235dc7d99e4d44a659a340a1807f8",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

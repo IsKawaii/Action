@@ -1,0 +1,26 @@
+#command                                                                           | Dialogue command: {log dialogue async}　　　　　　　　 | 
+#token                                                                             | Dialogue token code: {$standard}　　　　　　　　       | 
+                                                                                   | 　　　　　　　　                                       | 
+#define                                                                            | {Narr} means {[―]}.　　　　　　　                      | 
+#define                                                                            | {You} means {[]}.　　　　　　　　                      | 
+#define                                                                            | {Red} means {#EA5000}.　　　　　　　　                 | 
+                                                                                   | 　　　　　　　　                                       | 
+#define                                                                            | {Girl01} means {[アデレード]}.　　　                   | 
+#define                                                                            | {Girl02} means {[アリシア]}　　　　                    | 
+#define                                                                            | {Girl03} means {[アリーチェ]}.　　　                   | 
+                                                                                   | 　　　　　　　　                                       | 
+#define                                                                            | {ボタン} means {Button}.　　　　　                     | //ボタンを出すためのコマンド ファイルのラスト
+                                                                                   | 　　　　　　　　                                       | |
+Narr                                                                               | サンプルテキスト00-1                                   | |
+                                                                                   | 　　　　　　　　                                       | 
+Narr                                                                               | サンプルテキスト00-2                                   | 
+                                                                                   | 　　　　　　　　                                       | 
+#token                                                                             | Dialogue token code: {$f-standard}　　　　　　　　     | 
+                                                                                   | 　　　　　　　　                                       | 
+//[Likability:Alice+1][FlagToggle:SampleCategory.SampleFlag01][MoveText:1]         | aaa　　　　　　　　                                    | 
+                                                                                   | 　　　　　　　　                                       | 
+[Button:1][Likability:Alice+1][FlagToggle:SampleCategory.SampleFlag01][MoveText:1] | MoveText:1　　　　　　　　                             | 
+                                                                                   | 　　　　　　　　                                       | 
+[Button:2][Likability:Alice+1][FlagCheck:SampleCategory.SampleFlag02][MoveText:2]  | MoveText:0　　　　　　　　                             | 
+                                                                                   | 　　　　　　　　                                       | 
+[Button:3][Likability:Alice+1][MoveText:2]                                         | MoveText:1　　　　　　　　                             | 

@@ -1,0 +1,19 @@
+{
+    "name": "ScenarioFlow.Scripts.Composite.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5df09d124d9a871458b5a26fa57a4677",
+        "GUID:2c196fce1ea802d498a78d46f23fcb7a",
+        "GUID:89dba8e0ff5e23b408f6ad2e26048cba",
+        "GUID:8ee40603af27f0f48ad6bd40bfcb0ebd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

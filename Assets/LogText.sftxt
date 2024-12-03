@@ -1,0 +1,17 @@
+$hello    | log delayed message async                                      | 
+          | Message: {Hello.}                                              | 
+          | Delay time: {10} sec.                                          | 
+$sync     | log message                                                    | 
+          | Message: {A message will be displayed in 10 seconds.}          | 
+$standard | accept task async                                              | 
+          | Wait for the completion of {hello}.                            | 
+$bye      | log delayed message async                                      | 
+          | Message: {Bye.}                                                | 
+          | Delay time: {10} sec.                                          | 
+$standard | log dialogue async                                             | 
+          | {}:                                                            | 
+          | {Move on to the next within 10 seconds to cancel the message.} | 
+$sync     | cancel task                                                    | 
+          | Cancel task {bye}.                                             | 
+$sync     | log message                                                    | 
+          | Message: {Finished.}                                           | 

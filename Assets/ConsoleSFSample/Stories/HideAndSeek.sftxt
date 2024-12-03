@@ -1,0 +1,89 @@
+#command    | Dialogue command: {log dialogue async}                                                 | 
+#xcommand   | Ex-dialogue command: {log colorful dialogue async}                                     | 
+#token      | Dialogue token code: {$standard}                                                       | 
+            |                                                                                        | 
+//          | Use 'Narr' for narration texts!                                                        | 
+            | It will be replaced with a empty.                                                      | 
+#define     | {Narr} means {}.                                                                       | 
+#define     | {Little} means {1}.                                                                    | 
+#define     | {Red} means {#EA5000}.                                                                 | 
+            |                                                                                        | 
+#define     | {Girl} means {Alice}.                                                                  | 
+            |                                                                                        | 
+Narr        | One day, you ran into a friend in the park.                                            | 
+            |                                                                                        | 
+Narr        | He said he'd go buy some snacks and left his daughter with you before going somewhere. | 
+            |                                                                                        | 
+Girl        | Hello, I'm Alice.                                                                      | 
+            |                                                                                        | 
+Girl        | Please call me "Allie."                                                                | 
+            |                                                                                        | 
+#define     | {Girl} means {Allie}.                                                                  | 'Allie' is displayed as Alice's name.
+            |                                                                                        | 
+Girl        | Let's play hide-and-seek together!                                                     | 
+            |                                                                                        | 
+Girl        | I'm the hider. Please count 1 minute.                                                  | 
+            |                                                                                        | 
+Narr        | While you count the time, Alice is looking for a hiding spot.                          | 
+            |                                                                                        | 
+Girl        | Hmm, where should I hide?                                                              | 
+            |                                                                                        | 
+//          | Token code for dialogue command changes.                                               | 
+            | The player doesn't have to press the key.                                              | 
+#token      | Dialogue token code: {$f-standard}                                                     | 
+Girl        | Behind the tree...?                                                                    | 
+            |                                                                                        | 
+$serial     | delay seconds async                                                                    | 
+            | Wait for {5} seconds.                                                                  | 
+$parallel   | log dialogue async                                                                     | 
+            | {Pigeon}:                                                                              | 
+            | {Coo!}                                                                                 | 
+$parallel   | log dialogue async                                                                     | 
+            | {Pigeon 2}:                                                                            | 
+            | {Cooo!!}                                                                               | 
+$parallel   | log dialogue async                                                                     | 
+            | {Pigeon 3}:                                                                            | 
+            | {Coooo!!!}                                                                             | 
+$serial     | delay seconds async                                                                    | 
+            | Wait for {Little} seconds.                                                             | 
+            |                                                                                        | 
+//          | Token code for dialogue command changes.                                               | 
+            | The player has to press the key.                                                       | 
+#token      | Dialogue token code: {$standard}                                                       | 
+Girl        | Oh! Many pegions here!                                                                 | Orange color
+            | --> Text color: {#EE7800}                                                              | 
+            |                                                                                        | 
+Girl        | Should I look for another place to hide...?                                            | 
+            |                                                                                        | 
+Narr        | After 1 minutes, you started to seek.                                                  | 
+            |                                                                                        | 
+Narr        | Where do you search?                                                                   | Cyan color
+            | --> Text color: {#00FFFF}                                                              | 
+            |                                                                                        | 
+$f-promised | branch on 2 selections async                                                           | 
+            | Selection 1: {Behind the tree}                                                         | 
+            | - Jump to {Ans1}                                                                       | 
+            | Selection 2: {Under the slide}                                                         | 
+            | - Jump to {Ans2}                                                                       | 
+            |                                                                                        | 
+#label      | //============ {Ans1} ============//                                                   | 
+            |                                                                                        | 
+Girl        | Oh, you got me!                                                                        | 
+            |                                                                                        | 
+$sync       | jump to label                                                                          | 
+            | Jump to {Exit}.                                                                        | 
+            |                                                                                        | 
+#label      | //============ {Ans2} ============//                                                   | 
+            |                                                                                        | 
+Narr        | You searched under the slide, but she wasn't there.                                    | 
+            |                                                                                        | 
+Girl        | I was behind the tree. I win!                                                          | 
+            | --> Text color: {Red}                                                                  | 
+            |                                                                                        | 
+#label      | //============ {Exit} ============//                                                   | 
+Girl        | So, why don't you play again?                                                          | 
+            |                                                                                        | 
+Girl        | The next round, you'll hide, and I'll seek.                                            | 
+            |                                                                                        | 
+Narr        | It continued even after your friend returned.                                          | 
+            | In the end, you played hide-and-seek until dusk...                                     | 

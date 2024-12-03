@@ -1,0 +1,12 @@
+#command　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#xcommand　　 | Ex-dialogue command: {log colorful dialogue async}　　　　　　 | 
+#xcommand　　 | Ex-dialogue command: {log delayed message async}　　　　　　   | 
+#token　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　          | 　　　　　　                                                   | 
+　　          | 　　　　　　                                                   | 
+(キィ)        | とりあえず、周りを見て回らないと。                               | 
+　　          | 　　　　　　                                                   | 
+(キィ)        | はあ、お腹減った…　　　　　　　　                               | 
+　　          | 　　　　　　                                                   | 
+[End:End]　　 | 　　　　　　                                                   | 
+||

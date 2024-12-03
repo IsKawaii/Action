@@ -1,0 +1,19 @@
+#command                                                       | Dialogue command: {log dialogue async}　　　　　　　　 | 
+#token                                                         | Dialogue token code: {$standard}　　　　　　　　       | 
+                                                               | 　　　　　　　　                                       | 
+#define                                                        | {Narr} means {[―]}.　　　　　　　                     | 
+#define                                                        | {You} means {[]}.　　　　　　　　                      | 
+#define                                                        | {Red} means {#EA5000}.　　　　　　　　                 | 
+                                                               | 　　　　　　　　                                       | 
+#define                                                        | {Girl01} means {[アデレード]}.　　　                   | 
+#define                                                        | {Girl02} means {[アリシア]}　　　　                    | 
+#define                                                        | {Girl03} means {[アリーチェ]}.　　　                   | 
+                                                               | 　　　　　　　　                                       | 
+#define                                                        | {Button} means {Button}.　　　　　　　　               | //ボタンを出すためのコマンド ファイルのラスト
+                                                               | 　　　　　　　　                                       | |
+Narr                                                           | サンプルテキスト01-1                                   | |
+                                                               | 　　　　　　　　                                       | 
+Narr                                                           | サンプルテキスト01-2                                   | 
+                                                               | 　　　　　　　　                                       | 
+[Button:1][FlagToggle:SampleCategory.SampleFlag02][MoveText:2] | 02-3　　　　　　　　                                   | 
+                                                               | 　　　　　　　　                                       | 

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2512634223786813643
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1792766418308473902}
+  - component: {fileID: 1383930751069349015}
+  m_Layer: 0
+  m_Name: StageGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1792766418308473902
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2512634223786813643}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1383930751069349015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2512634223786813643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fe5dd202bac24f4e80a102077eeef54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sectionPrefabs:
+  - {fileID: 5403396555292436396, guid: b4c6c18123436f743a04205b5f37d97d, type: 3}
+  - {fileID: 1521954449421766280, guid: 0107cbbd4b2cd0147847173a1a27e401, type: 3}
+  - {fileID: 7292752150361946480, guid: 527559756e2082b4796a34d1bdd3c390, type: 3}
+  - {fileID: 6957649724514518764, guid: a15dfb5f0d89b354cae3735f49c0ac85, type: 3}
+  playerPrefab: {fileID: 3688468581314491440, guid: 1dd067c8b09ec6245b4f5b1983a02fac, type: 3}
+  exitPrefab: {fileID: 1636982945372633580, guid: 4ad2220172142224aa6d8d75476c0a0d, type: 3}
+  virtualCamera: {fileID: 0}
+  numberOfSections: 3
+  totalFloors: 4
+  spawnPoint: {x: 0, y: 0, z: 0}
+  playerscript: {fileID: 3701790035453519363, guid: 1dd067c8b09ec6245b4f5b1983a02fac, type: 3}

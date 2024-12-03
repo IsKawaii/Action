@@ -1,0 +1,17 @@
+{
+    "name": "ScenarioFlow.Scripts.SFText",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2c196fce1ea802d498a78d46f23fcb7a",
+        "GUID:6bf235dc7d99e4d44a659a340a1807f8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,22 @@
+#command  | Dialogue command: {log dialogue async}              | 
+#xcommand | Ex-dialogue command: {log colorful dialogue async}  | 
+#token    | Dialogue token code: {$standard}                    | 
+          |                                                     | 
+#define   | {Narr} means {}.                                    | Symbols 'Narr' will be replaced by empties.
+#define   | {Red} means {#EA5000}.                              | 
+#define   | {Girl} means {Allie}.                               | 'Allie' is displayed as Alice's name.
+          |                                                     | 
+#label    | //============ {Ans2} ============//                | 
+          |                                                     | 
+Narr      | You searched under the slide, but she wasn't there. | 
+          |                                                     | 
+Girl      | I was behind the tree. I win!                       | 
+          | --> Text color: {Red}                               | 
+          |                                                     | 
+#label    | //============ {Exit} ============//                | 
+Girl      | So, why don't you play again?                       | 
+          |                                                     | 
+Girl      | The next round, you'll hide, and I'll seek.         | 
+          |                                                     | 
+Narr      | It continued even after your friend returned.       | 
+          | In the end, you played hide-and-seek until dusk...  | 
