@@ -23,11 +23,13 @@ public class Bubble : Weapon
     {
         if (rb != null)
         {
+            audioSource = GetComponent<AudioSource>();
              // 発射角度をランダムに設定
             float randomAngle = Random.Range(angleRange.x, angleRange.y);
             Vector2 launchDirection = Quaternion.Euler(0, 0, randomAngle) * direction;
             rb.velocity = launchDirection * speed;
             rb.WakeUp();
+            //audioSource.PlayOneShot(fireSE);
         }
     }
 

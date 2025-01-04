@@ -7,27 +7,9 @@ using TMPro;
 public class EquipMenu : MonoBehaviour
 {   
     public Player player;
-
-    public GameObject ballButtonPrefab; // 球ボタンのプレハブ
-    public Transform ballButtonContainer; // 球ボタンを配置するコンテナ
-
-    public GameObject weaponButtonPrefab; // 武器ボタンのプレハブ
-    public Transform weaponButtonContainer; // 武器ボタンを配置するコンテナ
-
-    public GameObject skillButtonPrefab; // スキルボタンのプレハブ
-    public Transform skillButtonContainer; // スキルボタンを配置するコンテナ
-
-    public GameObject buttonPrefab; // ボタンのプレハブ
-    public Transform buttonContainer; // ボタンを配置するコンテナ
-
-    public GameObject EquipSelectMenu; // 武器やスキルへ進むためのパネル
-    public GameObject HealEquipMenu; 
-
-    private List<HealSkill> acquiredHealSkills; // 取得済みのHealSkillリスト
-    private List<FiringSkill> acquiredFiringSkills; // 取得済みのFiringSkillリスト
-
-    public GameObject SkillUnlockMenu; // スキルツリーのパネル
-    // 他のスキルリストもここに追加
+    public TextMeshProUGUI buttonDscriptionText;
+    public GameObject ballButtonPrefab, weaponButtonPrefab, skillButtonPrefab; 
+    public Transform ballButtonContainer, weaponButtonContainer, skillButtonContainer; 
 
     void OnEnable()
     {
@@ -44,7 +26,6 @@ public class EquipMenu : MonoBehaviour
     void HandlePlayerCreated(Player newPlayer)
     {
         player = newPlayer;
-        Debug.Log("Player object found.");
         //UpdateWeaponMenu();
     }
 
@@ -88,6 +69,13 @@ public class EquipMenu : MonoBehaviour
                             buttonText.text = ballBaseScript.ballName;
                         }
                         button.GetComponent<Button>().onClick.AddListener(() => player.EquipBall(ball));
+
+                        EquipButtonDescription equipButtonDescription = button.GetComponent<EquipButtonDescription>();
+                        if (ballBaseScript != null && equipButtonDescription != null)
+                        {
+                            equipButtonDescription.buttonDscription = buttonDscriptionText;
+                            equipButtonDescription.dscriptionText = ballBaseScript.ballDscription;
+                        }
                     }   
                     else
                     {
@@ -124,7 +112,6 @@ public class EquipMenu : MonoBehaviour
         foreach (Weapon weapon in weaponInventory)
         {
             GameObject buttonobject = Instantiate(weaponButtonPrefab, weaponButtonContainer);
-            Debug.Log("Button instantiated: " + buttonobject.name);
 
             if (buttonobject != null)
             {
@@ -136,6 +123,13 @@ public class EquipMenu : MonoBehaviour
                     {
                         buttonText.text = weapon.weaponName;
                         button.GetComponent<Button>().onClick.AddListener(() => ChoiceEquipWeapon(weapon));
+
+                        EquipButtonDescription equipButtonDescription = button.GetComponent<EquipButtonDescription>();
+                        if (equipButtonDescription != null)
+                        {
+                            equipButtonDescription.buttonDscription = buttonDscriptionText;
+                            equipButtonDescription.dscriptionText = weapon.weaponDescription;
+                        }
                     }   
                     else
                     {
@@ -206,6 +200,13 @@ public class EquipMenu : MonoBehaviour
                     {
                         buttonText.text = skill.skillName;
                         button.onClick.AddListener(() => ChoiceSkill(skill));
+
+                        EquipButtonDescription equipButtonDescription = button.GetComponent<EquipButtonDescription>();
+                        if (equipButtonDescription != null)
+                        {
+                            equipButtonDescription.buttonDscription = buttonDscriptionText;
+                            equipButtonDescription.dscriptionText = skill.description;
+                        }
                     }
                     else
                     {
@@ -234,6 +235,10 @@ public class EquipMenu : MonoBehaviour
         {
             return player.acquiredBuffSkills as List<T>;
         }
+        else if (typeof(T) == typeof(PassiveSkill))
+        {
+            return player.acquiredPassiveSkills as List<T>;
+        }
 
         Debug.LogError("Unsupported skill type: " + typeof(T));
         return null;
@@ -245,51 +250,4 @@ public class EquipMenu : MonoBehaviour
         Debug.Log(skill.skillName + " has been equipped.");
     }
     #endregion     
-
-
-    /*
-    public void CreateSkillButton(Skill skill)
-    {
-        GameObject buttonObject = Instantiate(buttonPrefab, buttonContainer);
-        Button button = buttonObject.GetComponent<Button>();
-
-        // ボタンのテキストをスキル名に設定
-        TextMeshProUGUI buttonText = buttonObject.GetComponentInChildren<TextMeshProUGUI>();
-        buttonText.text = skill.skillName;
-        Debug.Log(skill.skillName);
-
-        // ボタンにクリックイベントを追加
-        button.onClick.AddListener(() => EquipSkill(skill));
-    }
-
-    private void EquipSkill(Skill skill)
-    {
-        Player player = FindObjectOfType<Player>();
-        if (player != null)
-        {
-            player.EquipSkill(skill); // スキルを装備する
-            Debug.Log(skill.skillName + " が装備されました。");
-        }
-    }
-
-    public void SelectHealSkill()
-    {
-        EquipSelectMenu.SetActive(false);
-        HealEquipMenu.SetActive(true);
-        Player player = FindObjectOfType<Player>();
-        if (player != null)
-        {
-            acquiredHealSkills = player.GetAcquiredHealSkills();
-            acquiredFiringSkills = player.GetAcquiredFiringSkills();
-            // 他のスキルリストもプレイヤーから取得
-
-            // それぞれのリストからボタンを生成
-            foreach (HealSkill skill in acquiredHealSkills)
-            {
-                CreateSkillButton(skill);
-                Debug.Log("A");
-            }
-        }
-    }
-    */
 }

@@ -23,9 +23,11 @@ public class Triangle : Weapon
     {
         if (rb != null)
         {
+            audioSource = GetComponent<AudioSource>();
             Vector2 launchDirection = Quaternion.Euler(0, 0, 0) * direction;
             rb.velocity = launchDirection * speed;
             rb.WakeUp();
+            //audioSource.PlayOneShot(fireSE);
         }
     }
 

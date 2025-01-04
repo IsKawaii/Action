@@ -1,0 +1,6 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　　                                                   | 
+(ナレーター)        | に球をぶつけると、対応するオブジェクトが出現・消滅したりする。 | 
+　　　　　          | 　　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　　                                                   | 

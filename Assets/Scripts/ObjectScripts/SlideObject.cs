@@ -3,23 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // RigidBodyが付いている動くオブジェクト
-public class SlideObject : MonoBehaviour
+public class SlideObject : GimmickObjects
 {
-    [SerializeField] private Vector2 targetPosition; // 目標位置;
+    [SerializeField] private Vector2 localTargetPosition; // 目標位置（ローカル）;
+    private Vector2 worldTargetPosition;
     [Header("一回だけ動けばいいならチェックを外す")]
     [SerializeField] private bool returning = true; // 一回だけ動けばいいならチェックを外す
     public float moveSpeed = 1f; //
     private Rigidbody2D rb = null;
     private Collider2D myCollider;
     private Vector2 startPosition;
-    private bool toggle = false, isMoving = false, isActive = true; 
+    private bool isMoving = false, isActive = true; 
+
+
+    [Header("移動経路")] public GameObject[] movePoint;
+    private Vector2 oldPos = Vector2.zero;
+    private Vector2 myVelocity = Vector2.zero;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<Collider2D>();
         startPosition = rb.position;
-        targetPosition = rb.position + targetPosition;
+        worldTargetPosition = rb.position + localTargetPosition; // ローカル座標からワールド座標になる
+        oldPos = rb.position;
     }
 
     void FixedUpdate()
@@ -27,19 +34,22 @@ public class SlideObject : MonoBehaviour
         if (isMoving && toggle) // toggleがfalse→trueなら
         {
             // 現在の位置からターゲット位置に向かって移動
-            Vector2 newPosition = Vector2.MoveTowards(rb.position, targetPosition, moveSpeed * Time.fixedDeltaTime);
+            Vector2 newPosition = Vector2.MoveTowards(rb.position, worldTargetPosition, moveSpeed * Time.fixedDeltaTime);
             rb.MovePosition(newPosition);
+            myVelocity = (rb.position - oldPos) / Time.deltaTime;
+            oldPos = rb.position;
 
             // 到達チェック
-            if (Vector2.Distance(rb.position, targetPosition) < 0.01f)
+            if (Vector2.Distance(rb.position, worldTargetPosition) < 0.01f)
             {
                 isMoving = false; // 移動を停止
+                myVelocity = Vector2.zero;
                 Debug.Log("移動1終了");
-                if (targetPosition.x != 0)
+                if (localTargetPosition.x != 0)
                 {
                     rb.constraints |= RigidbodyConstraints2D.FreezePositionX; // X軸方向のロック
                 }
-                if (targetPosition.y != 0)
+                if (localTargetPosition.y != 0)
                 {
                     rb.constraints |= RigidbodyConstraints2D.FreezePositionY; // Y軸方向のロック
                 }
@@ -50,23 +60,31 @@ public class SlideObject : MonoBehaviour
             // 現在の位置からターゲット位置に向かって移動
             Vector2 newPosition = Vector2.MoveTowards(rb.position, startPosition, moveSpeed * Time.fixedDeltaTime);
             rb.MovePosition(newPosition);
+            myVelocity = (rb.position - oldPos) / Time.deltaTime;
+            oldPos = rb.position;
 
             // 到達チェック
             if (Vector2.Distance(rb.position, startPosition) < 0.01f)
             {
                 isMoving = false; // 移動を停止
+                myVelocity = Vector2.zero;
                 Debug.Log("移動2終了");
-                if (targetPosition.x != 0)
+                if (localTargetPosition.x != 0)
                 {
                     rb.constraints |= RigidbodyConstraints2D.FreezePositionX; // X軸方向のロック
                 }
-                if (targetPosition.y != 0)
+                if (localTargetPosition.y != 0)
                 {
                     rb.constraints |= RigidbodyConstraints2D.FreezePositionY; // Y軸方向のロック
                 }
             }
         }
     } 
+
+    public Vector2 GetVelocity()
+    {
+        return myVelocity;
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -80,12 +98,12 @@ public class SlideObject : MonoBehaviour
                 Physics2D.IgnoreCollision(myCollider, otherCollider, true); // 衝突を無効化
             }
 
-            if (targetPosition.x != 0)
+            if (localTargetPosition.x != 0)
             {
                 rb.constraints &= ~RigidbodyConstraints2D.FreezePositionX; // X軸方向のロックを解除
             }
 
-            if (targetPosition.y != 0)
+            if (localTargetPosition.y != 0)
             {
                 rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY; // Y軸方向のロックを解除
             }
@@ -101,15 +119,16 @@ public class SlideObject : MonoBehaviour
         }
 
         // 移動中に他オブジェクトと衝突したら停止
-        if ((collision.gameObject.CompareTag("Obstacle") || collision.gameObject.CompareTag("GimmicObstacle")))
+        if ((collision.gameObject.CompareTag("Obstacle") || collision.gameObject.CompareTag("GimmicObstacle") || collision.gameObject.CompareTag("SlideObject")))
         {
             isMoving = false;
             Debug.Log("停止");
-            if (targetPosition.x != 0)
+            myVelocity = Vector2.zero;
+            if (localTargetPosition.x != 0)
                 {
                     rb.constraints |= RigidbodyConstraints2D.FreezePositionX; // X軸方向のロック
                 }
-                if (targetPosition.y != 0)
+                if (localTargetPosition.y != 0)
                 {
                     rb.constraints |= RigidbodyConstraints2D.FreezePositionY; // Y軸方向のロック
                 }

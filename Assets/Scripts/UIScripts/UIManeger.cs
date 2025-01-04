@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     #region // 画面上の数字とか
     [SerializeField] TextMeshProUGUI floorNumberText;
     public TextMeshProUGUI plsyerLevelText;
+    public GameObject particlePrefab; // パーティクルのプレハブ
 
     #endregion
 
@@ -76,7 +77,22 @@ public class UIManager : MonoBehaviour
     private void UpdateLevelUI(int newLevel)
     {
         plsyerLevelText.text = "Level: " + newLevel.ToString();
-        Debug.Log("Level updated to: " + newLevel);
+        //GenerateParticle();
+    }
+
+    public void GenerateParticle()
+    {
+        // テキストの位置を取得
+        RectTransform textRectTransform = plsyerLevelText.GetComponent<RectTransform>();
+        Vector3 worldPosition = textRectTransform.position;
+
+        // パーティクルを生成
+        GameObject particle = Instantiate(particlePrefab, worldPosition, Quaternion.identity);
+
+        particle.transform.SetParent(plsyerLevelText.transform.parent, false);
+
+        // テキストのローカル座標に合わせる
+        particle.transform.localPosition = plsyerLevelText.GetComponent<RectTransform>().localPosition;
     }
 
     #endregion

@@ -1,0 +1,11 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　          | 　　                              | 
+　　          | 　　                              | 
+(アンシア.1-0-1)    | 次にいつお風呂入れるかわからないし汗かきたくないなあ。      | 
+　　          | 　　                              | 
+(アンシア.1-1-2)    | うう、水浴びでもいいから、せめてお着替えだけでもしたい… | 
+　　          | 　                              | 
+(アンシア)    | わたしまだ臭くないよな？お化粧も崩れてないよな？ | 
+　　          | 　　                              | 
+[End:End]　　 | 　　                              | 

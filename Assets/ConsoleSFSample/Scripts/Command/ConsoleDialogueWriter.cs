@@ -45,9 +45,8 @@ namespace ConsoleSFSample
 		public Dictionary<string, string> characterColors = new Dictionary<string, string>()
 		//public Dictionary<string, string> characterColors = gameObject.AddComponent<Dictionary<string, string>>();
     	{
-        	{ "Narr", "#FF0000" }, // 赤
-        	{ "―", "#0000FF" },   // 青
-        	{ "Girl01", "#00FF00" } // 緑
+        	{ "アンシア", "0000FF" },   // 青
+        	{ "ナレーター", "#00FF00" } // 緑
     	};
 		
 

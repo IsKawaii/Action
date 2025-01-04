@@ -1,0 +1,8 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　　　　　　　　　                                                   | 
+(ナレーター.普通)        | 星弾は敵にぶつけることで攻撃にも使える。長押しすることで速度と威力が上昇。           | 
+　　　　　          | 　　　　　　　　　　　　　　                                                   | 
+(ナレーター)        | 決まった数までしか撃てないが、発射回数は時間経過ですぐ回復する。　　　　　　　　　           | 
+　　　　　          | 　　　　　　　　　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　　　　　　　　　                                                   | 

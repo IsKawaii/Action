@@ -5,6 +5,7 @@ using UnityEngine;
 public class ColliderCheck : MonoBehaviour
 {
     private string groundTag = "Obstacle";
+    private string slideObjectTag = "SlideObject";
     private string gimmicTag = "GimmicObstacle";
 
     private HashSet<Collider2D> groundColliders = new HashSet<Collider2D>();
@@ -27,7 +28,7 @@ public class ColliderCheck : MonoBehaviour
             groundColliders.Add(collision);
         }
 
-        if (collision.CompareTag(gimmicTag))
+        if (collision.CompareTag(gimmicTag) || collision.CompareTag(slideObjectTag))
         {
             groundColliders.Add(collision);
             gimmicColliders.Add(collision);
@@ -41,7 +42,7 @@ public class ColliderCheck : MonoBehaviour
             groundColliders.Remove(collision);
         }
 
-        if (collision.CompareTag(gimmicTag))
+        if (collision.CompareTag(gimmicTag) || collision.CompareTag(slideObjectTag))
         {
             groundColliders.Remove(collision);
             gimmicColliders.Remove(collision);

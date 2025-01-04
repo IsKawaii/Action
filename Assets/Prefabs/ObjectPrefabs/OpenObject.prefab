@@ -98,7 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fcef39c2292d1144b3ab6c2848ba762, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 3701790035453519363, guid: 1dd067c8b09ec6245b4f5b1983a02fac, type: 3}
   notifier: {fileID: 0}
+  destroyEffectPrefab: {fileID: 6773132830396675760, guid: b4ca7e1184303fd44bc4ec936f589a2c, type: 3}
 --- !u!61 &8370526923552914357
 BoxCollider2D:
   m_ObjectHideFlags: 0

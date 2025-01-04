@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4699656337541785133}
   - component: {fileID: 1585391695013146452}
-  - component: {fileID: 5578511896744085393}
   - component: {fileID: 6285247126256984894}
+  - component: {fileID: 640749258858736248}
   m_Layer: 0
   m_Name: MoveObject
   m_TagString: GimmicObstacle
@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1585391695013146452
 SpriteRenderer:
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 101bc5fb77ce04d418aa15875bf65c79, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 62bafb6e3829c9e4bbaec6345edb3031, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -86,8 +86,26 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &5578511896744085393
-BoxCollider2D:
+--- !u!114 &6285247126256984894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7141099589940266553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 828f567a9de481341973369a2589bab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 3701790035453519363, guid: 1dd067c8b09ec6245b4f5b1983a02fac, type: 3}
+  targetPosition: {x: 0, y: -14}
+  returning: 1
+  sprite1: {fileID: 21300000, guid: 62bafb6e3829c9e4bbaec6345edb3031, type: 3}
+  sprite2: {fileID: 21300000, guid: 2065f5b061d84024fbca4d17274ca064, type: 3}
+  moveSpeed: 8
+--- !u!60 &640749258858736248
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -128,21 +146,14 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &6285247126256984894
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7141099589940266553}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 828f567a9de481341973369a2589bab7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetPosition: {x: 0, y: -14}
-  returning: 1
-  moveSpeed: 8
+  m_Points:
+    m_Paths:
+    - - {x: 0, y: -0.46}
+      - {x: 0.32, y: -0.32}
+      - {x: 0.45, y: 0.06}
+      - {x: 0.32, y: 0.42}
+      - {x: -0.18, y: 0.42}
+      - {x: -0.02, y: -0.04}
+      - {x: -0.46, y: -0.04}
+      - {x: -0.32, y: -0.32}
+  m_UseDelaunayMesh: 0

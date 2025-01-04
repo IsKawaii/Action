@@ -9,11 +9,15 @@ public abstract class Enemy : MonoBehaviour
     [Header("ゲーム内から見れるこの敵に関するテキスト")] public string enemyDescription;
     [Header("この敵に関する簡単な説明")] [SerializeField] protected string memo;
     [Space(10)]public float health; 
-    public float attackPower, jumpForce, moveSpeed, moveRange, attackRange;   
+    public int attackPower;
+    public float jumpForce, moveSpeed, moveRange, attackRange;   
     public float returnSpeed, searchRange;
     public GameObject[] dropItems;  // ドロップするアイテムの配列
     public float dropRate = 0.5f;  // アイテムがドロップする確率（0.5 = 50%）
     public int xpValue = 50;
+    public GameObject dieEffectPrefab; // パーティクルシステムのプレハブ
+    public GameObject damageTextPrefab; // ダメージ表記のPrefab
+    public Transform damageTextPosition;     // 表示位置
 
     protected virtual void Start()
     {
@@ -23,7 +27,9 @@ public abstract class Enemy : MonoBehaviour
     public virtual void TakeDamage(float damage)
     {
         health -= damage;
-        Debug.Log(damage + "与えた");
+        GameObject damageText = Instantiate(damageTextPrefab, damageTextPosition.position, Quaternion.identity);
+        DamageText DamageTextScript = damageText.GetComponent<DamageText>();
+        DamageTextScript.Setup(damage);
         if (health <= 0)
         {
             DropItem();
@@ -38,7 +44,11 @@ public abstract class Enemy : MonoBehaviour
         {
             player.GainXP(xpValue);
         }
-        
+
+        if (dieEffectPrefab != null)
+        {
+            Instantiate(dieEffectPrefab, transform.position, Quaternion.identity);
+        }
         Destroy(gameObject);
     }
 

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic;  // リストを扱うために必要
+using System.Collections.Generic;  
 
 public class InputManager : MonoBehaviour
 {
@@ -12,6 +12,9 @@ public class InputManager : MonoBehaviour
 
     // 許可されたキーのリスト
     private List<KeyCode> allowedKeys = new List<KeyCode>();
+
+    // 無効化されたキーのリスト
+    private List<KeyCode> blockedKeys = new List<KeyCode>();
 
     private void Awake()
     {
@@ -29,7 +32,7 @@ public class InputManager : MonoBehaviour
     // 特定のキーが押され続けているかどうかを確認する (Input.GetKey)
     public bool GetKey(KeyCode keyCode)
     {
-        if (!isInputBlocked || allowedKeys.Contains(keyCode))
+        if ((!isInputBlocked || allowedKeys.Contains(keyCode)) && !blockedKeys.Contains(keyCode))
         {
             return Input.GetKey(keyCode);
         }
@@ -39,7 +42,7 @@ public class InputManager : MonoBehaviour
     // 特定のキーが押されたかどうかを確認する（Input.GetKeyDown）
     public bool GetKeyDown(KeyCode keyCode)
     {
-        if (!isInputBlocked || allowedKeys.Contains(keyCode))
+        if ((!isInputBlocked || allowedKeys.Contains(keyCode)) && !blockedKeys.Contains(keyCode))
         {
             return Input.GetKeyDown(keyCode);
         }
@@ -49,7 +52,7 @@ public class InputManager : MonoBehaviour
     // 特定のキーが離されたかどうかを確認する（Input.GetKeyUp）
     public bool GetKeyUp(KeyCode keyCode)
     {
-        if (!isInputBlocked || allowedKeys.Contains(keyCode))
+        if ((!isInputBlocked || allowedKeys.Contains(keyCode)) && !blockedKeys.Contains(keyCode))
         {
             return Input.GetKeyUp(keyCode);
         }
@@ -76,7 +79,7 @@ public class InputManager : MonoBehaviour
     // 許可されたキーを設定する
     public void SetAllowedKeys(params KeyCode[] keys)
     {
-        allowedKeys.Clear();
+        //allowedKeys.Clear();
         allowedKeys.AddRange(keys);
     }
 
@@ -84,5 +87,18 @@ public class InputManager : MonoBehaviour
     public void ClearAllowedKeys()
     {
         allowedKeys.Clear();
+    }
+
+    // 無効化されたキーを設定する
+    public void SetBlockedKeys(params KeyCode[] keys)
+    {
+        //blockedKeys.Clear();
+        blockedKeys.AddRange(keys);
+    }
+
+    // 無効化されたキーをクリアする
+    public void ClearBlockedKeys()
+    {
+        blockedKeys.Clear();
     }
 }

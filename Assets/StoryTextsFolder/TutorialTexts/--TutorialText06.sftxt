@@ -1,0 +1,10 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+(ナレーター)        | ブロックに球をぶつけると決まった方向へ移動する。          | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+(ナレーター)        | 再び球をぶつけることで元の場所へと戻る。          | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+(ナレーター)        | 移動の途中に他のブロックがあれば移動は終わる。          | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+[End:End]　　　　　 | 　　　　　　　　　　　　　　　　　　                              | 

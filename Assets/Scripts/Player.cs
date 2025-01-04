@@ -7,25 +7,33 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     #region //パブリック
-    public float speed;  
-    public float gravity;
-    public float jumpSpeed;
-    public float jumpHeight;
-    public float jumpLimitTime;//ジャンプ制限時間
-    public float dashSpeed; 
-    public float dashLimitTime; //ダッシュ可能時間、スタミナ
-    public float xmoveDistance = 0.5f; // 崖登りの時の横の移動量
-    public float ymoveDistance = 0.5f; // 崖登りの時の縦の移動量
-    public int maxHealth = 100; // 最大体力
-    public int maxMP = 100; // 最大MP
-    public int currentHealth; // 現在の体力
-    public int currentMP; // 現在のMP
-    public int savecost = 10;
+    #region //基礎ステータス・プレイヤーの設定とか
+    public float speed, gravity;
+    public float jumpSpeed, jumpHeight, jumpLimitTime;//ジャンプ制限時間
+    public float dashSpeed, dashLimitTime; //ダッシュ可能時間、スタミナ
+    public float xmoveDistance = 0.5f, ymoveDistance = 0.5f; // 崖登りの時の移動量
+    public AnimationCurve moveCurve, dashCurve, jumpCurve;
     public float basedAttack = 10;
-    public int currentXP = 0;    // 現在の経験値
-    public int level = 0;        // 現在のレベル
-    public int xpToNextLevel = 100; // 次のレベルに必要な経験値
+    public int maxHealth = 100, maxMP = 100;
+    [HideInInspector] public int currentHealth, currentMP; 
+    public int HPup = 3, MPup = 3, basedAttackup = 1; // レベルアップで上がるHP・MP・基礎攻撃力
+    public int currentXP = 0, level = 0, xpToNextLevel = 100; // 次のレベルに必要な経験値
+    public delegate void OnLevelUp(int newLevel);
+    public event OnLevelUp onLevelUp;
+    public Vector3 spawnPoint; // プレイヤーの初期スポーンポイント
+    public GameObject savepointPrefab; //セーブポイント（リスポーンポイント）のプレハブ
+    public float respawnInputDisableTime = 2.0f; // リスポーン後の入力無効時間（秒）
+    public static event Action<Player> OnPlayerCreated; // プレイヤー生成イベント
+    public int savecost = 10;
+    public float invincibilityTime = 2.0f; // 無敵状態の時間（秒）
+    public float knockbackForce = 5.0f, knockbackDuration = 0.5f; // ノックバックの力・持続時間
     public PlayerShooter playerShooter;
+    public GameObject walkEffect, jumpEffect, levelUpEffect;
+    public Transform levelUpEffectPosition; // レベルアップパーティクルの位置
+    public Vector3 levelUpOffset; // 微調整用のオフセット (Inspectorで設定可能)
+    public GameObject damageTextPrefab; // ダメージ表記のPrefab
+    public Transform damageTextPosition;     // ダメージの表示位置
+    #endregion
 
     #region //スキル系
     public int skillPoints;
@@ -42,122 +50,82 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    public AnimationCurve moveCurve;
-    public AnimationCurve dashCurve;
-    public AnimationCurve jumpCurve;
-
-    public delegate void OnLevelUp(int newLevel);
-    public event OnLevelUp onLevelUp;
-    public UIManager uiManager;
-
-    public Vector3 spawnPoint; // プレイヤーの初期スポーンポイント
-    public GameObject savepointPrefab; //セーブポイント（リスポーンポイント）のプレハブ
-    public float respawnInputDisableTime = 2.0f; // リスポーン後の入力無効時間（秒）
-    public static event Action<Player> OnPlayerCreated; // プレイヤー生成イベント
-
-    public float invincibilityTime = 2.0f; // 無敵状態の時間（秒）
-    public float knockbackForce = 5.0f; // ノックバックの力
-    public float knockbackDuration = 0.5f; // ノックバックの持続時間
-    
+    #region  // 装備する弾や武器とか
     public GameObject equippedBallPrefab; // 装備中の球
     public List<GameObject> ballInventory = new List<GameObject>(); // 球のプレハブのリスト
     
     public GameObject startingWeaponPrefab; //開始時の武器
     public Weapon equippedWeapon; // 装備中の武器
     public List<Weapon> weaponInventory = new List<Weapon>(); //武器インベントリ
+    #endregion
 
+    #region // その他外部のオブジェクトやスクリプトとか
+    public UIManager uiManager;
     public WeaponUI weaponUI; //武器装備画面
-
     public SkillManager skillManager; // スキル管理クラスへの参照
+    public event Action creatSave, backToSave, Weaponequip, equipBall, equipWeapon, equipPassiveSkill; //イベントの通知
 
-
-    public event Action Weaponequip; //イベントの通知
-    public ColliderCheck frontgroundcheckscript;
-    public ColliderCheck backgroundcheckscript;
-
-    public ColliderCheck upperwallcheckscript;
-    public ColliderCheck bottomwallcheckscript;
-
-    public ColliderCheck frontceilingcheckscript;
-    public ColliderCheck backceilingcheckscript;
-
+    public ColliderCheck frontgroundcheckscript, backgroundcheckscript, upperwallcheckscript, bottomwallcheckscript, frontceilingcheckscript, backceilingcheckscript;
     public StageGenerator stageGenerator;
     public Vector3 savedPosition;
     public int savedHealth;
-    public bool isSceneChanging = false;
+    public AudioClip jumpSE, damageSE;
+    [HideInInspector]public bool isSceneChanging = false;
+    #endregion
     
     #endregion
-
-    [SerializeField] private int HPup = 3; // レベルアップで上がるHP
-    [SerializeField] private int MPup = 3;
-    [SerializeField] private int basedAttackup = 1; // レベルアップで上がる基礎攻撃力
-    private bool hasGameStarted = false;
  
     #region//プライベート変数
-    private Rigidbody2D rb = null;
-    private Animator anim = null;
+    private Rigidbody2D rb;
+    private Animator anim;
+    private ParticleSystem WalkParticle, jumpParticle;
+    private AudioSource audioSource;
+    private float xSpeed, ySpeed, tmpspeed; 
+    private bool hasGameStarted; // ゲーム開始の合図
 
-    private float xSpeed; 
+    private bool isFrontGround, isBackGround, wasGrounded; // 床に接触しているか・いたか
+    private bool isUpperWall, isBottomWall; //壁に接触しているか
+    private bool isCeiling, isFrontCeiling, isBackCeiling; // 天井に接触しているか
+    private bool isFrontGimmicObject, isBackGimmicObject, isFrontCeilingGimmicObject, isBackCeilingGimmicObject;
+    private bool isStickingWall, isStickingCeiling; // 壁や天井にくっついている状態
+    private bool isCliff; // 崖掴み状態か
 
-    private bool isFrontGround = false; // 体の前面が床に接触しているか
-    private bool isBackGround = false; // 体の後面が床に接触しているか
-    private bool isUpperWall = false; //体の上側が壁に接触しているか
-    private bool isBottomWall = false; //体の下側が壁に接触しているか
-    private bool isCeiling = false; // 天井に接触しているか
-    private bool isFrontCeiling = false; // 天井に接触しているか
-    private bool isBackCeiling = false; // 天井に接触しているか
-    private bool isFrontGimmicObject = false, isBackGimmicObject = false, isFrontCeilingGimmicObject = false, isBackCeilingGimmicObject = false;
-    private bool isStickingWall = false; // 壁にくっついている状態
-    private bool isStickingCeiling = false; // 天井にくっついている状態
-    private bool isCliff = false; // 崖掴み状態か
+    private bool isClimbToWall, isClimbToCeiling;
+    private bool isJump, isMinJump, canJump;
+    private float jumpPos; //ジャンプした位置
+    private bool isAir; // 空中で止まって欲しいとき
 
-    private bool isClimbToWall = false;
-    private bool isClimbToCeiling = false;
-    private bool isJump = false;
-    private bool isMinJump = false;
-    private bool canJump = false;
-    private float jumpPos = 0.0f;
-    private bool isAir = false; // 空中で止まって欲しいとき
+    private bool isWalking, wasWalking; // 一フレーム前に歩いていたか
 
-    private bool ishorizontalmove = false; //自分で横移動入力しているか
-    private bool isverticalmove = false; // 自分で縦移動入力しているか
-    private float xmoveTime;
-    private float ymoveTime;
-    private float beforehorizontalKey;
-    private float beforeverticalKey;
-    private float dashTime; //ダッシュしている時間
-    private float NotdashTime; //ダッシュしてない時間
+    private bool ishorizontalmove, isverticalmove; // 自分で横や縦の移動入力しているか
+    private float xmoveTime, ymoveTime;
+    private float beforehorizontalKey, beforeverticalKey;
+    private float dashTime, NotdashTime; //ダッシュしている時間・してない時間
     private float jumpTime;
     [SerializeField] private float jumpInterval = 0.1f; // 着地してから次にジャンプ可能になるまでの時間
     private float groundTimer; 
     [SerializeField] private float minJumpHeight = 1.0f; // 最短押し時のジャンプの最低の高さ
-    private float tmpspeed; //プレイヤーの移動速度を一時的に保管する
 
-    private bool isInvincible = false; // 無敵状態フラグ
-    private float invincibilityTimer; // 無敵状態のタイマー
-    private bool isKnockback = false; // ノックバック中かどうか
-    private float knockbackTimer; // ノックバックのタイマー
-    private bool isInputDisabled = false; // 入力無効フラグ
-    private float inputDisableTimer; // 入力無効のタイマー
-    private bool isinMenu = false; //メニューを開いているか
-    private bool isAttacking = false; //攻撃中かどうか
-    private bool isUsingSkill = false; //スキルを使用中か
+    private bool isInvincible, isKnockback, isInputDisabled; // 無敵状態か、ノックバック中か、入力無効か
+    private float invincibilityTimer, knockbackTimer, inputDisableTimer; // 無敵状態のタイマー、ノックバックのタイマー、入力無効のタイマー
+    private bool isinMenu; //メニューを開いているか
+    private bool isAttacking, isUsingSkill; //攻撃中かどうか・スキルを使用中か
 
     private GameObject currentSavepoint; // 現在のセーブポイント
     private PlayerShooter shooter;
-    private bool isCharging;
-    private Vector3 weaponPosition; //武器の発射位置
+    private bool isCharging; // 弾のチャージ中か
+    private Transform weaponspawnpoint;
+    private Vector3 weaponFirePosition; //武器の発射位置
     private Quaternion weaponRotation; //武器の発射角度
-    private Weapon tempWeapon; //武器の情報を保持
+    private Weapon weaponScript, tempWeapon, tempPrefab; //武器の情報を保持
 
     private Vector3 skillPosition; //武器の発射位置
     private Quaternion skillRotation; //武器の発射角度
     private FiringSkill tempSkill; //武器の情報を保持
     private HealSkill tempHealSkill;
 
-    private float ySpeed;
-    private Transform originalParent; // 元の親オブジェクト
-    private Transform dontDestroyParent; // DontDestroyOnLoad管理の親オブジェクト
+    private Transform originalParent, dontDestroyParent; // 元の親オブジェクトとDontDestroyOnLoad管理の親オブジェクト
+    private SlideObject slideObj;
 
     #endregion
 
@@ -170,10 +138,10 @@ public class Player : MonoBehaviour
 
     public void Initialize() // 最初にやる
     {
-        
-        //コンポーネントのインスタンスを捕まえる
+        //OnPlayerCreated?.Invoke(this); // プレイヤー生成を通知
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         if (SceneManager.GetActiveScene().name == "RandomScene") // ホームシーン以外ならステージ生成
         {
             GameObject stageGeneratorobj = GameObject.Find("StageGenerator"); 
@@ -220,8 +188,11 @@ public class Player : MonoBehaviour
         }
 
         SavePosition();
+        jumpParticle = jumpEffect.GetComponent<ParticleSystem>();
+        WalkParticle = walkEffect.GetComponent<ParticleSystem>();
         shooter.InitializeShooter();
         hasGameStarted = true;
+        Debug.Log(hasGameStarted);
 
         Debug.Log("初期化");
     }
@@ -233,23 +204,27 @@ public class Player : MonoBehaviour
 
     void Update() // ユーザー入力を取得（移動以外）
     {
-        UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
-        //UIMagicBar.instance.SetValue(20/ 100);
-        UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
+        //UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
+        //UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
+
         if (InputManager.instance.GetKeyDown(KeyCode.E) && !isinMenu) // Eキーを押したときにセーブポイントを設定
         {
             SavePosition();
         }
 
-        if (InputManager.instance.GetKeyDown(KeyCode.R)) //メニュー画面のオンオフ切り替え
+        if (InputManager.instance.GetKeyDown(KeyCode.R)) // メニュー画面のオンオフ切り替え
         {
             Toggle(); 
         }
 
-        if (InputManager.instance.GetKeyDown(KeyCode.O)) // 
+        if (InputManager.instance.GetKeyDown(KeyCode.O)) // セーブポイントにワープ
         {
-            //Die(); 
             Respawn();
+        }
+
+        if (InputManager.instance.GetKeyDown(KeyCode.Q) && !isAttacking) // Qキーを押し続けると攻撃を発射
+        {
+            StartCoroutine(Attack());
         }
 
         #region // タイマー関連
@@ -280,9 +255,8 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (!canJump && (isFrontGround || isBackGround || ((isUpperWall || isBottomWall) && (!isFrontGround && !isBackGround))))
+        if (!canJump && (isFrontGround || isBackGround || ((isUpperWall || isBottomWall) && (!isFrontGround && !isBackGround)))) // ジャンプのクールタイム
         {
-            //jumpInterval -= Time.deltaTime;
             groundTimer -= Time.deltaTime;
             if (groundTimer <= 0)
             {
@@ -318,17 +292,16 @@ public class Player : MonoBehaviour
 
         if (InputManager.instance.GetKeyUp(KeyCode.K)) // 発射キーを離したときに発射
         {
+            Debug.Log("発射");
             isCharging = false;
             Vector2 ballDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
             shooter.Fire(ballDirection);
         }
         #endregion
 
-        if (InputManager.instance.GetKeyDown(KeyCode.Q) && !isAttacking) // Qキーを押し続けると攻撃を発射
-        {
-            StartCoroutine(Attack());
-        }
 
+        //使わなくなったかも 
+        /*
         if (InputManager.instance.GetKeyDown(KeyCode.G))
         {
             StartCoroutine(UseSkill(KeyCode.G, equippedFiringSkill));
@@ -341,12 +314,6 @@ public class Player : MonoBehaviour
         {
             StartCoroutine(UseSkill(KeyCode.B, equippedBuffSkill));
         }
-
-        if (InputManager.instance.GetKeyDown(KeyCode.C))
-        {
-            //ToggleStick();
-        }
-
 
         if ((isFrontCeiling || isBackCeiling) && transform.localScale.y < 0) // 床に刺さる体制になっていたら回転
         {
@@ -378,30 +345,6 @@ public class Player : MonoBehaviour
             isCliff = false;
         }
 
-        if ((isFrontCeilingGimmicObject || isBackCeilingGimmicObject) && (isFrontGround || isBackGround || isFrontGimmicObject || isBackGimmicObject))
-        {
-            Die();
-            Debug.Log("はさまれた");
-        }
-
-
-        if (isAir)
-        {
-            if (isClimbToCeiling && (isFrontCeiling || isBackCeiling))
-            {
-                isStickingCeiling = true;
-                isAir = false;
-                isClimbToCeiling = false;
-            }
-            else if (isClimbToWall && (isUpperWall || isBottomWall))
-            {
-                isStickingWall = true;
-                isAir = false;
-                isClimbToWall = false;
-            }
-            Debug.Log("isAir" + isAir);
-        }
-
         if (isCliff || (isStickingCeiling && !isFrontCeiling))
         {
             if (InputManager.instance.GetKeyDown(KeyCode.Z))
@@ -425,7 +368,37 @@ public class Player : MonoBehaviour
                 ClimbDown();
             }
         }
-        
+
+        if (isAir)
+        {
+            if (isClimbToCeiling && (isFrontCeiling || isBackCeiling))
+            {
+                isStickingCeiling = true;
+                isAir = false;
+                isClimbToCeiling = false;
+            }
+            else if (isClimbToWall && (isUpperWall || isBottomWall))
+            {
+                isStickingWall = true;
+                isAir = false;
+                isClimbToWall = false;
+            }
+            Debug.Log("isAir" + isAir);
+        }
+        */
+
+        if ((isFrontCeilingGimmicObject || isBackCeilingGimmicObject) && (isFrontGround || isBackGround || isFrontGimmicObject || isBackGimmicObject))
+        {
+            Die();
+            Debug.Log("はさまれた");
+        }
+
+        if (!isFrontGround && wasGrounded)  // 地上→空中に切り替わる瞬間
+        {
+            jumpParticle.Play();  // ジャンプ時のパーティクルを再生
+        }
+
+        wasGrounded = isFrontGround;
     }
  
     void FixedUpdate()
@@ -451,7 +424,6 @@ public class Player : MonoBehaviour
 
         //キー入力されたら行動する
         float horizontalKey = Input.GetAxis("Horizontal");
-        float xSpeed = 0.0f; 
         float verticalKey = Input.GetAxis("Vertical");
         float jumpKey = Input.GetAxis("Jump"); 
         float yJumpSpeed= 0.0f;
@@ -461,31 +433,26 @@ public class Player : MonoBehaviour
         if ((transform.localScale.x > 0 && horizontalKey < 0) || (transform.localScale.x < 0 && horizontalKey > 0))
         {
             shooter.flipAngle();
-            Debug.Log("FlipAngle");
         }
 
-        if (horizontalKey > 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x < 0)) // 天井のとき
+        if (horizontalKey > 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x < 0)) // 天井のとき 未使用
         {
-            Debug.Log("天井");
             xmoveTime += Time.deltaTime;
             xSpeed = speed;
             ishorizontalmove = true;
-            // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey < 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x > 0)) // 天井のとき
+        else if (horizontalKey < 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x > 0)) // 天井のとき 未使用
         {
-            Debug.Log("天井");
             xmoveTime += Time.deltaTime;    
             xSpeed = -speed;
             ishorizontalmove = true;
-            // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
         else if (horizontalKey > 0 && (isFrontGround || isBackGround || isFrontCeiling || isBackCeiling)) // 床や天井のとき
         {
-            Debug.Log("床");
-            anim.SetBool("walk", true);
+            isWalking = true;
+            //anim.SetBool("walk", true);
             xmoveTime += Time.deltaTime;
             xSpeed = speed;
             ishorizontalmove = true;
@@ -494,28 +461,26 @@ public class Player : MonoBehaviour
         }
         else if (horizontalKey < 0 && (isFrontGround || isBackGround || isFrontCeiling || isBackCeiling)) // 床や天井のとき
         {   
-            Debug.Log("床");
-            anim.SetBool("walk", true);    
+            isWalking = true;
+            //anim.SetBool("walk", true);    
             xmoveTime += Time.deltaTime;    
             xSpeed = -speed;
             ishorizontalmove = true;
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey > 0 && (isUpperWall || isBottomWall) && transform.localScale.x <0) // 壁のとき
+        else if (horizontalKey > 0 && (isUpperWall || isBottomWall) && transform.localScale.x <0) // 壁のとき 未使用
         {
-            Debug.Log("壁");
-            anim.SetBool("walk", true);
+            //anim.SetBool("walk", true);
             xmoveTime += Time.deltaTime;
             xSpeed = speed;
             ishorizontalmove = true;
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey < 0 && (isUpperWall || isBottomWall) && transform.localScale.x > 0) // 壁のとき
+        else if (horizontalKey < 0 && (isUpperWall || isBottomWall) && transform.localScale.x > 0) // 壁のとき 未使用
         {       
-            Debug.Log("壁");
-            anim.SetBool("walk", true);
+            //anim.SetBool("walk", true);
             xmoveTime += Time.deltaTime;    
             xSpeed = -speed;
             ishorizontalmove = true;
@@ -524,8 +489,8 @@ public class Player : MonoBehaviour
         }
         else if (horizontalKey > 0 && !isFrontGround && !isBackGround && !isFrontCeiling && !isBackCeiling && !isUpperWall && !isBottomWall) // 空中のとき
         {
-            Debug.Log("空中");
-            anim.SetBool("walk", true);
+            //anim.SetBool("walk", true);
+            //WalkParticle.Stop();
             xmoveTime += Time.deltaTime;
             xSpeed = speed;
             ishorizontalmove = true;
@@ -534,8 +499,8 @@ public class Player : MonoBehaviour
         }
         else if (horizontalKey < 0 && !isFrontGround && !isBackGround && !isFrontCeiling && !isBackCeiling && !isUpperWall && !isBottomWall) // 空中のとき
         {       
-            Debug.Log("空中");
-            anim.SetBool("walk", true);
+            //anim.SetBool("walk", true);
+            //WalkParticle.Stop();
             xmoveTime += Time.deltaTime;    
             xSpeed = -speed;
             ishorizontalmove = true;
@@ -544,30 +509,56 @@ public class Player : MonoBehaviour
         }
         else
         {
-            anim.SetBool("walk", false);
+            isWalking = false;
+            //anim.SetBool("walk", false);
+            //WalkParticle.Stop();
             ishorizontalmove = false;
             xSpeed = 0.0f;
             xmoveTime = 0.0f;
+        }
+
+        float moveInput = Input.GetAxis("Horizontal");
+        isWalking = Mathf.Abs(moveInput) > 0.01f; // 少しでも入力があれば移動と判定
+        // 移動し始める瞬間
+        if (isWalking && !wasWalking)
+        {
+            WalkParticle.Play(); // パーティクル再生
+        }
+        // 移動が完全に止まった瞬間
+        else if (!isWalking && wasWalking)
+        {
+            WalkParticle.Stop(); // パーティクル停止
         }
         
 
         //方向転換したら加速し直す
         if (horizontalKey > 0 && beforehorizontalKey < 0)
         {
+            WalkParticle.Stop();
+            WalkParticle.Clear();
+            WalkParticle.Play();
             xmoveTime = 0.0f;
         }
         else if (horizontalKey < 0 && beforehorizontalKey > 0)
         {
+            WalkParticle.Stop();
+            WalkParticle.Clear();
+            WalkParticle.Play();
             xmoveTime = 0.0f;
         }
 
         beforehorizontalKey = horizontalKey;
+
+        // 現在の状態を保存
+        wasWalking = isWalking;
 
         xSpeed *= moveCurve.Evaluate(xmoveTime);
     
         #endregion
 
         #region//縦移動
+        // 使わないなった
+        /*
         if (verticalKey > 0 && isStickingWall && (isUpperWall || transform.localScale.y < 0)) // 壁掴みかつ上半身に壁判定があるまたはキャラが下向きなら上移動
         {
             ymoveTime += Time.deltaTime;
@@ -613,6 +604,9 @@ public class Player : MonoBehaviour
             ySpeed = -gravity;
             isverticalmove = false;
         }     
+        */
+
+        ySpeed = -gravity;
 
         //方向転換したら加速し直す
         if (verticalKey > 0 && beforeverticalKey < 0)
@@ -639,6 +633,7 @@ public class Player : MonoBehaviour
                 jumpPos = transform.position.y; //ジャンプした位置を記録する
                 isJump = true;
                 jumpTime = 0.0f;
+                audioSource.PlayOneShot(jumpSE);
             }
             else
             {
@@ -689,10 +684,12 @@ public class Player : MonoBehaviour
                 Debug.Log("isMinJump");
             }
         }
+
+        
         
         #endregion
 
-        #region//ダッシュ
+        #region //ダッシュ（使ってない）
         //ダッシュ可能時間を超えていないか
         if (Input.GetKey(KeyCode.B) && dashLimitTime > dashTime && (ishorizontalmove || isverticalmove) )
         {
@@ -709,7 +706,6 @@ public class Player : MonoBehaviour
                 dashTime = dashTime - Time.deltaTime;
             }
         }
-        //MPBar.instance.SetValue(dashTime / (float)dashLimitTime);
         #endregion
         
         if (xSpeed != 0.0f)
@@ -734,7 +730,6 @@ public class Player : MonoBehaviour
             ySpeed = 0;
         }
 
-
         if (!isKnockback)
         {
             if (isJump)
@@ -744,17 +739,17 @@ public class Player : MonoBehaviour
             }
             else
             {
-                rb.velocity = new Vector2(xSpeed, ySpeed);
-                //Debug.Log("ySpeed" + ySpeed);
+                if (slideObj != null)
+                {
+                    Vector2 addVelocity = Vector2.zero;
+                    addVelocity = slideObj.GetVelocity();
+                    rb.velocity = new Vector2(xSpeed, ySpeed) + addVelocity;
+                }
+                else
+                    rb.velocity = new Vector2(xSpeed, ySpeed);
             }
         }
-
     }  
-
-    public void LateUpdate()
-    {
-
-    }
 
     private void MoveCharacter(float horizontalKey, float speed, bool flip) 
     {
@@ -890,9 +885,9 @@ public class Player : MonoBehaviour
     {
         equippedBallPrefab = newBallPrefab;
         playerShooter.InitializeBallUI();
-        //BallBase ballBaseScript = newBallPrefab.GetComponent<BallBase>();
+        playerShooter.equipBullet(newBallPrefab);
         BallBase ballBaseScript = newBallPrefab.GetComponent<BallBase>();
-        Debug.Log(ballBaseScript.ballName + "を装備");
+        equipBall?.Invoke();
     }
 
     public void EquipWeapon(Weapon newWeapon)
@@ -904,14 +899,14 @@ public class Player : MonoBehaviour
         }
 
         equippedWeapon = newWeapon;
+        weaponScript = equippedWeapon.GetComponent<Weapon>();
+        weaponspawnpoint = equippedWeapon.transform.Find("WeaponSpawnPoint");
         equippedWeapon.gameObject.SetActive(true); // 新しい武器を有効化
-        //equippedWeapon.transform.SetParent(transform); // プレイヤーの子オブジェクトとして設定
-        //equippedWeapon.transform.localPosition = Vector3.zero; // 必要に応じて位置を調整
-        Debug.Log("Equipped " + equippedWeapon);
+        equipWeapon?.Invoke();
         StopCoroutine(Attack());
     }
 
-    private IEnumerator Attack()
+    private IEnumerator Attack() // 処理の一部を装備時（EquipWeapon）に移したい
     {
         while (InputManager.instance.GetKey(KeyCode.Q) && !isinMenu)
         {
@@ -926,12 +921,14 @@ public class Player : MonoBehaviour
                 break;
             }
 
-            // プレハブのクローンを作成（非アクティブ状態）
-            Weapon tempPrefab = Instantiate(equippedWeapon);
-            tempPrefab.gameObject.SetActive(false);
-
+            //Weapon tempPrefab;
             // 攻撃の発射地点のTransformを取得
-            Transform weaponspawnpoint = tempPrefab.transform.Find("WeaponSpawnPoint");
+            if (weaponspawnpoint == null) // 無ければ攻撃の発射地点のTransformを取得
+            {
+                tempPrefab = Instantiate(equippedWeapon);
+                tempPrefab.gameObject.SetActive(false);
+                weaponspawnpoint = tempPrefab.transform.Find("WeaponSpawnPoint");
+            }
 
             // 攻撃の方向を調整
             if (weaponspawnpoint != null)
@@ -939,29 +936,31 @@ public class Player : MonoBehaviour
                 Vector2 attackDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
                 if (attackDirection == Vector2.right)
                 {
-                    weaponPosition = weaponspawnpoint.position;
+                    weaponFirePosition = weaponspawnpoint.position;
                     weaponRotation = weaponspawnpoint.rotation;
                 }
                 else
                 {
-                    weaponPosition = new Vector3(-weaponspawnpoint.localPosition.x, weaponspawnpoint.localPosition.y, weaponspawnpoint.localPosition.z);
+                    weaponFirePosition = new Vector3(-weaponspawnpoint.localPosition.x, weaponspawnpoint.localPosition.y, weaponspawnpoint.localPosition.z);
                     weaponRotation = weaponspawnpoint.rotation * Quaternion.Euler(0, 180, 0); // 180度回転させる
                 }
 
-
                 // 取得したTransformの情報を使用して再インスタンス化
-                Weapon weapon = Instantiate(equippedWeapon, transform.position + weaponPosition, weaponRotation);
+                Weapon weapon = Instantiate(equippedWeapon, transform.position + weaponFirePosition, weaponRotation);
 
                 // 一時クローンを削除
-                Destroy(tempPrefab.gameObject);
+                if (tempPrefab != null)
+                {
+                    Destroy(tempPrefab.gameObject);
+                }
 
                 equippedWeapon = weapon.GetComponent<Weapon>();
-
                 if (equippedWeapon != null)
                 { 
                     currentMP -= equippedWeapon.cost;
                     UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
-                    equippedWeapon.Attack(attackDirection); // プレイヤーの向いている方向に攻撃
+                    equippedWeapon.Attack(attackDirection); // プレイヤーの向いている方向に攻撃、ここで壊れる
+                    audioSource.PlayOneShot(equippedWeapon.fireSE);
                     equippedWeapon = tempWeapon; // 装備の情報を返す
                     yield return new WaitForSeconds(equippedWeapon.attackRate);
                 }
@@ -996,9 +995,9 @@ public class Player : MonoBehaviour
 
             // 新しいセーブポイントを生成し、currentSavepointに設定
             currentSavepoint = Instantiate(savepointPrefab, spawnPoint, Quaternion.identity);
-            currentMP -= savecost;
-            UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
-            //MPBar.instance.SetValue(currentMP / (float)maxMP);
+            creatSave?.Invoke(); // パズルのObject系全般
+            //currentMP -= savecost;
+            //UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
             Debug.Log("新しいセーブポイントを生成: " + currentSavepoint);
 
             // すべてのセーブポイントを確認
@@ -1050,13 +1049,22 @@ public class Player : MonoBehaviour
         maxMP = maxMP + MPup;
         basedAttack = basedAttack + basedAttackup;
         #endregion
+        // 左上のワールド座標を取得
+        Vector3 topLeftPosition = Camera.main.ViewportToWorldPoint(new Vector3(0, 1, Camera.main.nearClipPlane));
+
+        // オフセットを適用
+        Vector3 adjustedPosition = topLeftPosition + levelUpOffset;
+
+        // Z座標を調整 (2Dゲームの場合など)
+        adjustedPosition.z = 0;
+
+        // オブジェクトを生成
+        Instantiate(levelUpEffect, adjustedPosition, Quaternion.identity);
 
         currentXP -= xpToNextLevel;
         UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
         UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
         xpToNextLevel += 50; // レベルアップ毎に必要経験値を増加
-
-        Debug.Log("skillPoints: " + skillPoints);
     }
 
     public int GetCurrentEXP() => currentXP;
@@ -1064,6 +1072,7 @@ public class Player : MonoBehaviour
     #endregion
 
     #region //スキル関連
+    //スキルの装備（PassiveSkillの場合はこの時有効化）
     public void EquipSkill<T>(T newSkill) where T : Skill
     {
         if (newSkill is HealSkill)
@@ -1080,8 +1089,15 @@ public class Player : MonoBehaviour
         }
         else if (newSkill is PassiveSkill)
         {
+            if (equippedPassiveSkill != null)
+            {
+                equippedPassiveSkill.InvalidatePassiveSkill(this);
+                equippedPassiveSkill.InvalidateShooterPassiveSkill(shooter);
+            }
             equippedPassiveSkill = newSkill as PassiveSkill;
             equippedPassiveSkill.ActivatePassiveSkill(this);
+            equippedPassiveSkill.ActivateShooterPassiveSkill(shooter);
+            equipPassiveSkill?.Invoke(); // EquipSElectMenu
         }
         else
         {
@@ -1089,7 +1105,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    // スキルをアンロックする関数
+    // スキルをアンロックする
     public bool UnlockSkill<T>(T newSkill) where T : Skill
     {
         // 既にスキルがアンロックされている場合は何もしない
@@ -1118,9 +1134,13 @@ public class Player : MonoBehaviour
             {
                 acquiredBuffSkills.Add(newSkill as BuffSkill);
             }
+            else if (newSkill is PassiveSkill)
+            {
+                acquiredPassiveSkills.Add(newSkill as PassiveSkill);
+            }
 
             OnSkillUnlocked?.Invoke(newSkill); // スキルがアンロックされたことを通知
-            Debug.Log(newSkill.skillName + " がアンロックされました。");
+            Debug.Log(newSkill.skillName + " がアンロック。");
             return true;
         }
         else
@@ -1144,13 +1164,17 @@ public class Player : MonoBehaviour
         {
             return acquiredBuffSkills.Exists(s => s.skillName == skill.skillName);
         }
+        else if (skill is PassiveSkill)
+        {
+            return acquiredPassiveSkills.Exists(s => s.skillName == skill.skillName);
+        }
 
         return false;
     }
 
     #endregion
 
-    #region //スキル使用
+    #region //スキル使用 (保留)
     private IEnumerator UseSkill<T>(KeyCode key, T skillPrefab) where T : Skill
     {
         //while (Input.GetKey(key) && !isinMenu)
@@ -1413,16 +1437,20 @@ public class Player : MonoBehaviour
         {
             currentHealth -= damage;
             UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
-            Debug.Log("ダメージ受けた: " + damage + " 残り体力: " + currentHealth);
 
-            Debug.Log("ノックバック方向: " + knockbackDirection + " 力: " + knockbackForce); // ノックバックを適用
             rb.velocity = Vector2.zero; // 既存の速度をリセット
             rb.AddForce(knockbackDirection.normalized * knockbackForce, ForceMode2D.Impulse);
+
+            GameObject damageText = Instantiate(damageTextPrefab, damageTextPosition.position, Quaternion.identity);
+            DamageText DamageTextScript = damageText.GetComponent<DamageText>();
+            DamageTextScript.Setup(-damage);
+
+            audioSource.PlayOneShot(damageSE);
+
             isKnockback = true;
             knockbackTimer = knockbackDuration;
 
-            // 体力が0以下になったらデス
-            if (currentHealth <= 0)
+            if (currentHealth <= 0) // 体力が0以下になったらデス
             {
                 Die();
             }
@@ -1439,15 +1467,42 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void TakeDamageOnTimes(int damage) // スリップダメージ
+    {
+        if (!isInvincible)
+        {
+            currentHealth -= damage;
+            UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
+            Debug.Log("ダメージを受けてる");
+
+            if (currentHealth <= 0)
+            {
+                Die();
+            }
+        }
+        else
+        {
+            Debug.Log("無敵状態中のためダメージ無効");
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // ダメージオブジェクトに衝突した場合にダメージを受ける
-        if (collision.gameObject.CompareTag("DamageObject") || collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("DamageObject"))
         {
-            // ノックバックの方向を計算
             Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
-            int damage = collision.gameObject.CompareTag("DamageObject") ? 10 : 15;
-            TakeDamage(10, knockbackDirection); // 例えば、10のダメージを受ける
+            EnemyAttack enemyAttack = collision.gameObject.GetComponent<EnemyAttack>();
+            int damage = enemyAttack.attackPower;
+            TakeDamage(damage, knockbackDirection); 
+        }
+
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            int damage = enemy.attackPower;
+            TakeDamage(damage, knockbackDirection); 
         }
 
         if (collision.gameObject.CompareTag("GimmicObstacle"))
@@ -1455,6 +1510,12 @@ public class Player : MonoBehaviour
             originalParent = transform.parent; // 元の親を保存
             transform.SetParent(collision.transform); // 親子関係を設定
         }
+
+        if (collision.gameObject.CompareTag("SlideObject"))
+        {
+            slideObj = collision.gameObject.GetComponent<SlideObject>();
+        }
+           
     }
     
     private void OnCollisionStay2D(Collision2D collision)
@@ -1487,6 +1548,7 @@ public class Player : MonoBehaviour
     {
         // プレイヤーの位置をセーブポイントに設定
         transform.position = spawnPoint;
+        backToSave?.Invoke(); // パズルのObject系全般
         Debug.Log("復活: " + spawnPoint);
         // 体力を最大体力にリセット
         currentHealth = maxHealth;
@@ -1519,9 +1581,27 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region//武器（アイテムも？）の取得    
+    #region //武器・スキル（アイテムも？）の取得    
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.gameObject.CompareTag("BallItem"))
+        {
+            BallItem ballitem = other.GetComponent<BallItem>(); 
+            if (ballitem != null)
+            {
+                GameObject ballprefab = ballitem.GetPrefab(); 
+                if (ballprefab != null)
+                {
+                    BallBase ballBase = ballprefab.GetComponent<BallBase>(); 
+                    if (ballBase != null)
+                    {
+                        AddBallToInventory(ballprefab);
+                        Destroy(other.gameObject);
+                    }
+                }
+            }
+        }
+
         if (other.gameObject.CompareTag("WaeponItem"))
         {
             WeaponItem weaponitem = other.GetComponent<WeaponItem>(); //ウェポンアイテムかどうかを確認
@@ -1534,7 +1614,26 @@ public class Player : MonoBehaviour
                     if (weapon != null)
                     {
                         AddWeaponToInventory(weapon);
-                        EquipWeapon(weapon);
+                        //EquipWeapon(weapon);
+                        Destroy(other.gameObject);
+                    }
+                }
+            }
+        }
+
+        if (other.gameObject.CompareTag("SkillItem"))
+        {
+            SkillItem skillitem = other.GetComponent<SkillItem>(); //ウェポンアイテムかどうかを確認
+            if (skillitem != null)
+            {
+                GameObject skillprefab = skillitem.GetPrefab(); //ウェポンアイテムから武器のプレハブを取得
+                if (skillprefab != null)
+                {
+                    PassiveSkill passiveSkill = skillprefab.GetComponent<PassiveSkill>(); //武器プレハブからWeaponクラスを取得
+                    if (passiveSkill != null && !HasSkill(passiveSkill))
+                    {
+                        //AddWeaponToInventory(passiveSkill);
+                        acquiredPassiveSkills.Add(passiveSkill);
                         Destroy(other.gameObject);
                     }
                 }
@@ -1655,6 +1754,11 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("GimmicObstacle"))
         {
             SetDontDestroyParent();
+        }
+
+        if (collision.gameObject.CompareTag("SlideObject"))
+        {
+            slideObj = null;
         }
     }
 

@@ -1,0 +1,7 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　　　                                                   | 
+　　　　　          | 　　　　　　　　                                                   | 
+(ナレーター)        | 球を<sprite=1>に当てると出現する雲が切り替わる。                     | 
+　　　　　          | 　　　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　　　                                                   | 

@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 // スキルツリーのボタンにアタッチするスクリプト
 public class SkillTreeButton : MonoBehaviour
 {
     public GameObject skillPrefab; // このボタンが担当するスキル
-    public Button skillButton;
+    public Button skillButton; // このボタン
+    public TextMeshProUGUI buttonText; // このボタンのテキスト
     public Skill requiredSkill; // 前提スキル
     private Player player;       // プレイヤーのスクリプトへの参照
+    private bool havaThisSkill; 
 
     void Start()
     {
@@ -38,23 +41,23 @@ public class SkillTreeButton : MonoBehaviour
 
     public void UpdateButtonState() // ボタンの状態を更新
     {
-        Debug.Log("ツリーボタンを更新");
         if (player != null)
         {
-        Player player = FindObjectOfType<Player>();
+            Player player = FindObjectOfType<Player>();
         }
         if (player != null && skillPrefab != null)
         {
-            // 前提スキルが解放されているかどうかをチェック
-            if (player.HasSkill(requiredSkill) || requiredSkill == null)
+            if (!havaThisSkill && (player.HasSkill(requiredSkill) || requiredSkill == null))
             {
                 skillButton.interactable = true; // 押せるようにする
                 SetButtonColor(Color.white); // ボタンの色を通常色に戻す
+                buttonText.color = Color.white;
             }
             else
             {
                 skillButton.interactable = false; // 押せないようにする
                 SetButtonColor(Color.gray); // ボタンの色を変える
+                buttonText.color = Color.gray;
             }
         }
         else
@@ -63,7 +66,7 @@ public class SkillTreeButton : MonoBehaviour
         }
     }
 
-    void SetButtonColor(Color color) // ボタンの色を設定
+    private void SetButtonColor(Color color) // ボタンの色を設定
     {
         ColorBlock colorBlock = skillButton.colors;
         colorBlock.normalColor = color;
@@ -76,21 +79,21 @@ public class SkillTreeButton : MonoBehaviour
         Player player = FindObjectOfType<Player>();
         if (player != null && skillPrefab != null && skillButton.interactable)
         {
-            if( (requiredSkill == null) || (requiredSkill != null && player.HasSkill(requiredSkill)) )
+            if ( (requiredSkill == null) || (requiredSkill != null && player.HasSkill(requiredSkill)) )
             {
                 // プレハブからスキルオブジェクトを生成
                 GameObject skillObject = Instantiate(skillPrefab);
                 Skill skill = skillObject.GetComponent<Skill>();
                 if (skill != null)
                 {
-                    // スキルをアンロック
-                    player.UnlockSkill(skill);
+                    player.UnlockSkill(skill); // スキルをアンロック
+                    skillButton.interactable = false; // 押せないようにする
+                    havaThisSkill = true;
+                    SetButtonColor(Color.gray); // ボタンの色を変える
+                    buttonText.color = Color.gray;
                 }
-                // スキルオブジェクトを非アクティブ化してから削除
-                //skillObject.SetActive(false);
+                skillObject.SetActive(false);
                 //Destroy(skillObject);
-
-                //UpdateButtonState(); // 他のボタンの状態も更新
             }
             else if (!player.HasSkill(requiredSkill))
             {

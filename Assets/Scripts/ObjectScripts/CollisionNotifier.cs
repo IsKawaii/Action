@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollisionNotifier : MonoBehaviour
+public class CollisionNotifier : GimmickToggleObjects
 {
     // 衝突時に通知するイベント
     public delegate void CollisionEvent();
     public event CollisionEvent OnCollisionDetected;
+    public List<GameObject> targetObjectList = new List<GameObject>();
+    private bool isActive;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -14,6 +16,26 @@ public class CollisionNotifier : MonoBehaviour
         if (collision.gameObject.CompareTag("Ball"))
         {
             OnCollisionDetected?.Invoke();
+            toggle = true;
+        }
+    }
+
+    protected override void SavePosition()
+    {
+        savedToggle = toggle;
+    }
+
+    protected override void LoadPosition()
+    {
+        toggle = savedToggle;
+        isActive = !toggle; 
+        //gameObject.SetActive(isActive);
+        foreach (var obj in targetObjectList)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(isActive);
+            }
         }
     }
 }

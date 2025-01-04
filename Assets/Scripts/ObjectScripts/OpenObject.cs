@@ -5,7 +5,8 @@ using UnityEngine;
 public class OpenObject : MonoBehaviour
 {
     [SerializeField] private CollisionNotifier notifier; // オブジェクトAの通知スクリプトを参照
-
+    public GameObject destroyEffectPrefab;
+    
     private void Start()
     {
         // オブジェクトAの通知イベントにリスナーを登録
@@ -28,6 +29,9 @@ public class OpenObject : MonoBehaviour
     private void HandleCollision()
     {
         gameObject.SetActive(false);
+        Instantiate(destroyEffectPrefab, transform.position, Quaternion.identity);
+        //this.SetActive(false);
+        //Destroy(gameObject);
     }
 
     public void BackInitialState()

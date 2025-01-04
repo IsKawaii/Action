@@ -1,0 +1,9 @@
+#command　　　　  | Dialogue command: {log dialogue async}　　　　　　　　　　 | 
+#token　　　　    | Dialogue token code: {$standard}　　　　　　　　　　       | 
+　　　　          | 　　　　　　　　　　                                       | 
+　　　　          | 　　　　　　　　　　                                       | 
+(アンシア.0-0-0)  | この壁の向こう、空間がある？                   | 
+　　　　          | 　　　　　　　　　　                                       | 
+(アンシア.0-1-0)  | でも今は行く方法が無いな…                   | 
+　　　　          | 　　　　　　　　　　                                       | 
+[End:End]　　　　 | 　　　　　　　　　　                                       | 

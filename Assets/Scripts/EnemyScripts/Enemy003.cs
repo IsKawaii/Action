@@ -8,7 +8,8 @@ public class Enemy003 : Enemy
     {
     }
 
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    // この子の発射する弾の処理
+    protected virtual void OnCollisionEnter2D(Collision2D collision) 
     {
         if ((enemyName == "AttackPrefab") && (collision.gameObject.CompareTag("Obstacle") || collision.gameObject.CompareTag("GimmicObstacle") || collision.gameObject.CompareTag("Player")))
         {

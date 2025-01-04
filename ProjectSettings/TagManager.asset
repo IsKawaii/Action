@@ -18,6 +18,9 @@ TagManager:
   - GimmicObstacle
   - PlayArea
   - GimmicObstacleRB
+  - SlideObject
+  - SkillItem
+  - BallItem
   layers:
   - Default
   - TransparentFX
@@ -52,6 +55,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: 'BackGroundLayer '
+    uniqueID: 783972759
+    locked: 0
+  - name: BackObject
+    uniqueID: 861005761
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 897248413
+    locked: 0
+  - name: FrontObjects
+    uniqueID: 3385896723
     locked: 0

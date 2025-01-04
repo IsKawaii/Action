@@ -1,0 +1,9 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　                                                   | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター.普通)        | Qキーを押すと魔力を消費してアクティブスキルを発動できる。          | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター)        | アクティブスキルのための魔力は自動では回復しない。                 | 
+　　　　　          | 　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　                                                   | 

@@ -10,15 +10,14 @@ public class Enemy002 : Enemy
 
     public override void TakeDamage(float damage)
     {
-        /*
         damage = 0;
-        health -= damage;
-        Debug.Log(damage + "与えた");
+        GameObject damageText = Instantiate(damageTextPrefab, damageTextPosition.position, Quaternion.identity);
+        DamageText DamageTextScript = damageText.GetComponent<DamageText>();
+        DamageTextScript.Setup(damage);
         if (health <= 0)
         {
             DropItem();
             Die();
         }
-        */
     }
 }

@@ -1,0 +1,9 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　          | 　　                              | 
+　　          | 　　                              | 
+(アンシア.1-0-2)        | お腹が減ってきたらあの生き物を食べるしかないか？           | 
+　　          | 　　                              | 
+(アンシア.0-1-1)        | 生は流石に危ない…どうにかして焼かないと。           | 
+　　          | 　　                              |
+[End:End]　　 | 　　                              | 

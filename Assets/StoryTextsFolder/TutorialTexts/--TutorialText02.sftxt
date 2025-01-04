@@ -1,0 +1,8 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+(ナレーター)        | <sprite=14>は球がぶつけると移動する。         | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+(ナレーター)        | 上手く使えば敵を潰したり、戦いを有利にすることもできるかも。         | 
+　　　　　          | 　　　　　　　　　　　　　　　　　　                              | 
+[End:End]　　　　　 | 　　　　　　　　　　　　　　　　　　                              | 

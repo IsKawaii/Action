@@ -1,0 +1,11 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　　　　　　　　　 | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　　　　　　　　　       | 
+　　　　　          | 　　　　　　　　　　　　　　                                       | 
+　　　　　          | 　　　　　　　　　　　　　　                                       | 
+(ナレーター.普通)        | レベルアップなどでSPを入手することができる。                   | 
+　　　　　          | 　　　　　　　　　　　　　　                                       | 
+(ナレーター)        | 獲得したSPはメニューの「物思い」から使用できる。                   | 
+　　　　　          | 　　　　　　　　　　　　　　                                       | 
+(ナレーター)        | SPを使うことで新たな星弾やスキルを習得できる。　　　                 | 
+　　　　　          | 　　　　　　　　　　　　　　                                       |  
+[End:End]　　　　　 | 　　　　　　　　　　　　　　                                       | 

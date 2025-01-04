@@ -1,0 +1,11 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　                                                   | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター.普通)        | Kキーを押して星弾を発射。                                       | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター)        | 星弾を<sprite=12>に当てると対応する星々が消える。                 | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター)        | 新しい物を見つけたら星弾をぶつけると何か起こるかも。            | 
+　　　　　          | 　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　                                                   | 

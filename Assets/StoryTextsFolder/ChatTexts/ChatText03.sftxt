@@ -1,0 +1,9 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　          | 　　                              | 
+　　          | 　　                              | 
+(アンシア.0-0-1)        | そういえば体が軽いから歩いてても全然疲れないな。       | 
+　　          | 　　                              | 
+(アンシア.0-0-0)        | 元の世界に戻ったら体が重くて動けないとかあったりして。       | 
+　　          | 　　                              | 
+[End:End]　　 | 　　                              | 

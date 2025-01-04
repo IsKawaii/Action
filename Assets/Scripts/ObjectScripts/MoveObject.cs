@@ -2,19 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveObject : MonoBehaviour
+public class MoveObject : GimmickObjects
 {
     [SerializeField] private Vector2 targetPosition; // 目標位置;
     [Header("一回だけ動けばいいならチェックを外す")]
     [SerializeField] private bool returning = true; // 一回だけ動けばいいならチェックを外す
+    [SerializeField] private Sprite sprite1, sprite2;
+    private SpriteRenderer spriteRenderer;
     public float moveSpeed = 1f; //
     private Collider2D myCollider;
     private Vector2 startPosition, currentPosition;
-    private bool toggle = false, isActive = true, isMoving = false;
+    private bool isActive = true, isMoving = false;
 
     void Start()
     {
         myCollider = GetComponent<Collider2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         startPosition = transform.position;
         targetPosition = (Vector2)transform.position + targetPosition;
     }
@@ -30,6 +33,7 @@ public class MoveObject : MonoBehaviour
             if (Vector2.Distance(transform.position, targetPosition) < 0.01f)
             {
                 isMoving = false; // 移動を停止
+                //spriteRenderer.sprite = sprite2;
                 Debug.Log("移動1終了");
             }
         }
@@ -42,6 +46,7 @@ public class MoveObject : MonoBehaviour
             if (Vector2.Distance(transform.position, startPosition) < 0.01f)
             {
                 isMoving = false; // 移動を停止
+                //spriteRenderer.sprite = sprite1;
                 Debug.Log("移動2終了");
             }
         }
@@ -59,6 +64,7 @@ public class MoveObject : MonoBehaviour
             }
 
             toggle = !toggle;
+            SwitchSprite();
             isMoving = true;
 
             if (!returning) // 一回だけ動いて欲しい場合は衝突を検知しなくする
@@ -73,6 +79,19 @@ public class MoveObject : MonoBehaviour
         transform.position = startPosition;
         toggle = false;
         isActive = true;
+        spriteRenderer.sprite = sprite1;
+    }
+
+    private void SwitchSprite()
+    {
+        if (spriteRenderer.sprite == sprite1)
+        {
+            spriteRenderer.sprite = sprite2;
+        }
+        else
+        {
+            spriteRenderer.sprite = sprite1;
+        }
     }
     
 }

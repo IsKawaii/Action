@@ -1,0 +1,10 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+// 一個目の星弾の入手のためのアイテムにくっつける                                   ||
+　　　　　          | 　　　　　　                                                   | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター.普通)        | 入手した星弾やスキルはメニューの「おめかし」から装備できる。        |
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター)        | 今手に入れたパッシブスキルは装備しているだけで効果がある。          | 
+　　　　　          | 　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　                                                   | 

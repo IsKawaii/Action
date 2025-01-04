@@ -6,36 +6,32 @@ using UnityEngine;
 public class PlayerShooter : MonoBehaviour
 {
     public Player player;
-    //public BallDisplayUI ballDisplayUI;  // 残弾アイコン管理スクリプト
-    public ChargeDisplayUI chargeDisplayUI;  // チャージゲージ管理スクリプト
+    public GameObject fireEffectPrefab;
     public GameObject arrowUI; // 矢印のUIオブジェクト
     public Transform arrowAnchor; // 矢印を表示する位置
 
-    // 発射回数の制限
-    public int maxShots = 5; //最大球数
-    public int remainingShots; //現在の残球数
+    public float adjustReloadTime = 1f; // リロード速度の補正値 
+    public int maxShots = 5, remainingShots; 
 
     // 弾のプレハブと発射位置
     //[SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
 
-    // チャージ関連
-    private float chargeTime; 
-    private bool isCharging = false; // チャージ中かどうか
-    private float currentCharge = 0.0f;   // 現在のチャージ量
-    [SerializeField] private float maxChargeTime = 2f; // 最大チャージ時間（フルチャージまでの時間）
-    [SerializeField] private float minBulletSpeed = 5f;
-    [SerializeField] private float maxBulletSpeed = 20f;
-    [SerializeField] private float minBulletDamage = 10f;
-    [SerializeField] private float maxBulletDamage = 500f;
-    [SerializeField] private float angleAdjustmentSpeed = 10f; // 角度調整速度
-    [SerializeField] private float maxAngle = 80f; // 最大角度
-    [SerializeField] private float minAngle = -80f; // 最小角度
-    private float currentAngle = 0f; // 現在の発射角度
-    private Coroutine reloadCoroutine;
+    public GameObject chargeEffect;
 
+    // チャージ関連
+    private float chargeTime, currentCharge; 
+    private bool isCharging = false, finishCharge = false, fired = true; // チャージ中かどうか
+    [SerializeField] private float maxChargeTime = 2f, minBulletSpeed = 5f, maxBulletSpeed = 20f;
+    [SerializeField] private float minBulletDamage = 10f, maxBulletDamage = 500f;
+    [SerializeField] private float angleAdjustmentSpeed = 10f; // 角度調整速度
+    [SerializeField] private float maxAngle = 80f, minAngle = -80f; // 最小角度
+    private float currentAngle; // 現在の発射角度
+    private AudioSource audioSource;
+    private Coroutine reloadCoroutine;
+    private ParticleSystem chargeParticle;
     private GameObject equippedBallPrefab;
-    //[SerializeField] private GameObject sampleBallPrefab;
+    private BallBase ballBaseScript;
 
     private void OnEnable()
     {
@@ -65,6 +61,8 @@ public class PlayerShooter : MonoBehaviour
         remainingShots = maxShots;
         equippedBallPrefab = player.equippedBallPrefab;
         InitializeBallUI();
+        chargeParticle = chargeEffect.GetComponent<ParticleSystem>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -80,8 +78,8 @@ public class PlayerShooter : MonoBehaviour
         if (arrowUI.activeSelf)
         {
             // 矢印の位置をArrowAnchorの位置に合わせる
-            arrowUI.transform.position = arrowAnchor.position;
-
+            //arrowUI.transform.position = arrowAnchor.position + new Vector3(0.15f, 0, 0);
+            //arrowUI.transform.position = arrowAnchor.position
             // 矢印の角度を現在の発射角度に合わせる
             arrowUI.transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
         }
@@ -89,6 +87,13 @@ public class PlayerShooter : MonoBehaviour
         if (isCharging)
         {
             UpdateCharge();
+        }
+
+        if (finishCharge)
+        {
+            finishCharge = false;
+            chargeParticle.Stop();
+            Instantiate(fireEffectPrefab, transform.position, Quaternion.identity);
         }
     }
 
@@ -128,12 +133,20 @@ public class PlayerShooter : MonoBehaviour
         isCharging = true;
         arrowUI.SetActive(true);
         chargeTime = 0f;
+        chargeParticle.Play();
     }
 
     public void ContinueCharging(float deltaTime)
     {
         chargeTime += deltaTime;
         chargeTime = Mathf.Clamp(chargeTime, 0f, maxChargeTime);
+        if ((chargeTime >= maxChargeTime) && fired)
+        {
+            finishCharge = true;
+            fired = false;
+            //chargeParticle.Stop();
+            //Instantiate(fireEffectPrefab, transform.position, Quaternion.identity);
+        }
     }
 
     // 回数回復処理（外部から呼び出せるように）
@@ -153,9 +166,20 @@ public class PlayerShooter : MonoBehaviour
 
     private IEnumerator AutoReloadShots()
     {
+        if (ballBaseScript == null)
+        {
+            ballBaseScript = equippedBallPrefab.GetComponent<BallBase>();
+        }
+        float adjustedReloadTime = adjustReloadTime * ballBaseScript.reloadTime;
         while (remainingShots < maxShots)
         {
-            yield return new WaitForSeconds(3f); // 3秒待機
+            //yield return new WaitForSeconds(3f);
+            if (ballBaseScript == null)
+            {
+                ballBaseScript = equippedBallPrefab.GetComponent<BallBase>();
+            }
+            //yield return new WaitForSeconds(ballBaseScript.reloadTime); 
+            yield return new WaitForSeconds(adjustedReloadTime); 
             remainingShots++; 
             BallDisplayUI.Instance.UpdateBallIcons(remainingShots);
         }
@@ -182,7 +206,10 @@ public class PlayerShooter : MonoBehaviour
     // 発射処理
     public void Fire(Vector2 direction)
     {
+        fired = true;
         arrowUI.SetActive(false);
+        chargeParticle.Stop();
+        //Instantiate(fireEffectPrefab, transform.position, Quaternion.identity);
         if (remainingShots <= 0)
         {
             Debug.Log("発射回数が足りません！");
@@ -196,6 +223,7 @@ public class PlayerShooter : MonoBehaviour
         float chargeRatio = Mathf.Clamp01(chargeTime / maxChargeTime); // チャージ時間を超えても最大チャージ扱いにする
         float bulletSpeed = Mathf.Lerp(minBulletSpeed, maxBulletSpeed, chargeRatio); // チャージ時間に応じて速度を設定
         float bulletDamage = Mathf.Lerp(minBulletDamage, maxBulletDamage, chargeRatio); // ダメージも
+        bulletDamage = Mathf.Round(bulletDamage); // 数字を丸める
 
         // currentAngle を使って回転を適用
         Vector2 velocity = Quaternion.Euler(0, 0, currentAngle) * direction * bulletSpeed;
@@ -207,7 +235,7 @@ public class PlayerShooter : MonoBehaviour
         // 弾の設定を反映
         BallBase ballBaseScript = ball.GetComponent<BallBase>();
         ballBaseScript.Initialize(velocity, bulletDamage);
-        Debug.Log(ballBaseScript.ballName + "を発射");
+        audioSource.PlayOneShot(ballBaseScript.fireSE);
 
         remainingShots--;
         //ballDisplayUI.UpdateBallIcons(remainingShots);

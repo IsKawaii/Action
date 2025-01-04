@@ -6,17 +6,10 @@ using TMPro;
 public class StatusTextManager : MonoBehaviour
 {
     private Player playerScript;
-    [SerializeField] TextMeshProUGUI weaponText;
-    [SerializeField] TextMeshProUGUI firingSkillText;
-    [SerializeField] TextMeshProUGUI healSkillText;
-    [SerializeField] TextMeshProUGUI buffSkillText;
-    [SerializeField] TextMeshProUGUI passiveSkillText;
+    [SerializeField] TextMeshProUGUI ballText, weaponText, passiveSkillText;
+    //[SerializeField] TextMeshProUGUI firingSkillText, healSkillText, buffSkillText;
 
-    [SerializeField] TextMeshProUGUI levelText;
-    [SerializeField] TextMeshProUGUI hpText;
-    [SerializeField] TextMeshProUGUI mpText;
-    [SerializeField] TextMeshProUGUI atkText;
-    [SerializeField] TextMeshProUGUI expText;
+    [SerializeField] TextMeshProUGUI levelText, hpText, mpText, atkText, expText;
     [SerializeField] TextMeshProUGUI spText;
 
 
@@ -41,13 +34,35 @@ public class StatusTextManager : MonoBehaviour
         if (playerobj != null)
         {   
             Player playerScript = playerobj.GetComponent<Player>();
-            Debug.Log("Playerあり");
+            //ballText.text = playerScript.equippedBallPrefab.ballName;
+            BallBase ballBaseScript = playerScript.equippedBallPrefab.GetComponent<BallBase>();
+            if (ballBaseScript != null)
+            {
+                ballText.text = ballBaseScript.ballName;
+            }
             weaponText.text = playerScript.equippedWeapon.weaponName;
-            //firingSkillText.text = playerScript.equippedFiringSkill.skillName;
-            firingSkillText.text = playerScript.equippedFiringSkill != null ? playerScript.equippedFiringSkill.skillName : "装備なし";
-            healSkillText.text = playerScript.equippedHealSkill != null ? playerScript.equippedHealSkill.skillName : "装備なし";
-            buffSkillText.text = playerScript.equippedBuffSkill != null ? playerScript.equippedBuffSkill.skillName : "装備なし";
-            passiveSkillText.text = playerScript.equippedPassiveSkill != null ? playerScript.equippedPassiveSkill.skillName : "装備なし";
+            //firingSkillText.text = playerScript.equippedFiringSkill != null ? playerScript.equippedFiringSkill.skillName : "装備なし";
+            //healSkillText.text = playerScript.equippedHealSkill != null ? playerScript.equippedHealSkill.skillName : "装備なし";
+            //buffSkillText.text = playerScript.equippedBuffSkill != null ? playerScript.equippedBuffSkill.skillName : "装備なし";
+            if (playerScript.equippedPassiveSkill != null)
+            {
+                Debug.Log("パッシブスキルあり");
+                Skill skillScript = playerScript.equippedPassiveSkill.GetComponent<Skill>();
+                if (skillScript != null)
+                {
+                    passiveSkillText.text = skillScript.skillName;
+                }
+                else
+                {
+                    passiveSkillText.text = "装備なし";
+                }   
+            }
+            else
+            {
+                passiveSkillText.text = "装備なし";
+            }
+
+            //passiveSkillText.text = playerScript.equippedPassiveSkill != null ? playerScript.equippedPassiveSkill.skillName : "装備なし";
             levelText.text = $"Lv   {playerScript.level}";
             hpText.text = $"HP   {playerScript.GetCurrentHP()}/{playerScript.GetMaxHP()}";
             mpText.text = $"MP   {playerScript.GetCurrentMP()}/{playerScript.GetMaxMP()}";
@@ -55,20 +70,6 @@ public class StatusTextManager : MonoBehaviour
             atkText.text = $"ATK   {playerScript.basedAttack + playerScript.equippedWeapon.damage}";
             expText.text = $"EXP   {playerScript.GetCurrentEXP()}/{playerScript.GetxpToNextLevel()}";
             spText.text = $"SP    {playerScript.GetSP()}";
-
-            /*
-            firingSkillText.text = playerScript.equippedFiringSkill != null ? playerScript.equippedFiringSkill.skillName : "装備なし";
-            healSkillText.text = playerScript.equippedHealSkill.skillName;
-            buffSkillText.text = playerScript.equippedBuffSkill.skillName;
-            passiveSkillText.text = playerScript.equippedPassiveSkill.skillName;
-            levelText.text = $"Lv   {playerScript.level}";
-            hpText.text = $"HP   {playerScript.GetCurrentHP()}/{playerScript.GetMaxHP()}";
-            mpText.text = $"MP   {playerScript.GetCurrentMP()}/{playerScript.GetMaxMP()}";
-            atkText.text = $"ATK   {playerScript.basedAttack}";
-            //atkText.text = $"ATK   {playerScript.basedAttack + }+{playerScript.ATK}";
-            expText.text = $"EXP   {playerScript.GetCurrentEXP()}/{playerScript.GetxpToNextLevel()}";
-            spText.text = $"SP    {playerScript.GetSP()}";
-            */
         }
         else
         {

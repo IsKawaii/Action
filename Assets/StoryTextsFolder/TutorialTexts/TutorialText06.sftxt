@@ -1,0 +1,11 @@
+#command　　　　　  | Dialogue command: {log dialogue async}　　　　　　             | 
+#token　　　　　    | Dialogue token code: {$standard}　　　　　　                   | 
+　　　　　          | 　　　　　　                                                   | 
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター.普通)        | 敵に発見されていないとき、Eキーを押すとその場に記憶を生成できる。     |
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター)        | Oキーを押すと記憶の場所に戻ることができる。                        |
+　　　　　          | 　　　　　　                                                   | 
+(ナレーター)        | 記憶に戻る時、動かしていた物は記憶を生成した時の状態になる。        |
+　　　　　          | 　　　　　　                                                   | 
+[End:End]　　　　　 | 　　　　　　                                                   | 

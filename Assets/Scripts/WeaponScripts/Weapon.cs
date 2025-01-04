@@ -5,13 +5,12 @@ using System;
 
 public abstract class Weapon : MonoBehaviour
 {
-    public string weaponName;
-    public float damage;
-    public float speed;
-    public float attackRate;
-    public float lifetime;
+    public string weaponName, weaponDescription;
+    public float damage, speed, attackRate, lifetime;
     public int cost;
     protected Rigidbody2D rb;
+    protected AudioSource audioSource;
+    public AudioClip fireSE;
     public GameObject weaponPrefab;
     public Player player;
     protected float playerATK;
@@ -19,6 +18,7 @@ public abstract class Weapon : MonoBehaviour
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
         if (rb == null)
         {
             Debug.LogError("Rigidbody2D が見つかりません");

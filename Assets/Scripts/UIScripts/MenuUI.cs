@@ -85,6 +85,7 @@ public class MenuUI : MonoBehaviour
 
         if (isMenuActive)
         {
+            InvalidateKey();
             statusTextManager.UpdateText();
             uiManager.plsyerLevelText.enabled = false;
             Time.timeScale = 0; // ゲームを一時停止
@@ -96,6 +97,7 @@ public class MenuUI : MonoBehaviour
             Time.timeScale = 1; // ゲームを再開 
             uiManager.plsyerLevelText.enabled = true;
             StatusCharaMenu.SetActive(true);
+            ValidateKey();
         }
     }
 
@@ -131,7 +133,7 @@ public class MenuUI : MonoBehaviour
         }
     }
 
-    public void ToSelecWeaponMenu() // 武器を装備するためのメニューを開く
+    public void ToSelecWeaponMenu() // アクティブスキル（武器）を装備するためのメニューを開く
     {   
         SetOneMenuActive(MainMenu);
         EquipSelectMenu.SetActive(true);
@@ -163,10 +165,44 @@ public class MenuUI : MonoBehaviour
         }
     }
 
+    public void ToSelectPassiveSkillMenu() // ヒールスキルを装備するためのメニューを開く
+    {
+        SetOneMenuActive(MainMenu);
+        EquipSelectMenu.SetActive(true);
+        EquipPanelMenu.SetActive(true);
+        EquipMenu equipMenu = GetComponent<EquipMenu>();
+        if (equipMenu != null)
+        {
+            equipMenu.UpdateSkillMenu<PassiveSkill>();
+        }
+        else
+        {
+            Debug.LogWarning("aa");
+        }
+    }
+
     public void BackToMenu()
     {
         SetOneMenuActive(MainMenu);
     }
+
+    private void InvalidateKey()
+    {
+        // 全ての入力をブロック
+        InputManager.instance.BlockAllInputs(true);
+
+        // Iキーのみを許可
+        InputManager.instance.SetAllowedKeys(KeyCode.R);
+    }
+
+    private void ValidateKey()
+    {
+        // すべての入力を再度許可
+        InputManager.instance.BlockAllInputs(false);
+
+        // 許可されているキーをリセット
+        InputManager.instance.ClearAllowedKeys();
+    }   
 
     #endregion
   

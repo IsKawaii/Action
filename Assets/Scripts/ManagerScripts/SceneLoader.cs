@@ -5,7 +5,8 @@ public class SceneLoader : MonoBehaviour
 {
     public Player player;
     public PlayerShooter shooter;
-    public FadeImage fade;
+    //public FadeImage fade;
+    public FadeWithText fade;
     public string nextSceneName;
     private Collider2D myCollider;
     private bool isNextScenePlace = false, canGoNextScene = false;

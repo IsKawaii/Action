@@ -10,7 +10,7 @@ public class CreatePlayer : MonoBehaviour
     public Vector3 spawnPointforPlayer;
     public Quaternion startRotation;
 
-    void Start()
+    private void Start()
     {
         GameObject player = PlayerManager.Instance.GetOrCreatePlayer(spawnPointforPlayer, startRotation);
         PlayerManager.Instance.LoadPlayerState();
