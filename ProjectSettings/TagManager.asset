@@ -21,6 +21,10 @@ TagManager:
   - SlideObject
   - SkillItem
   - BallItem
+  - MainMenuButton
+  - EquipSelectButton
+  - SkillTreeButton
+  - EquipButton
   layers:
   - Default
   - TransparentFX

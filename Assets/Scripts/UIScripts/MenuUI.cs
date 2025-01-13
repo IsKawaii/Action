@@ -3,28 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 // このコードにメニューの開閉、武器やスキルを装備するためのボタンの生成・更新をしてもらう
 public class MenuUI : MonoBehaviour
 {
+    public CursorNavigationManager cursorNavigationManager;
     public Player player; // プレイヤーの参照
     public UIManager uiManager;
     public StatusTextManager statusTextManager;
-    public GameObject MainMenu; // メニューUIのパネル
+    public GameObject MainMenu, MainMenuButtonPanel;
     public GameObject charaStatusMenu;
     public GameObject EquipSelectMenu; // 武器やスキルへ進むためのパネル
     public GameObject EquipPanelMenu; // 武器やスキルを装備するためのメニュー
+    public Transform EquipPanel;
     public GameObject SkillUnlockMenu; // スキルツリーのパネル
     public GameObject StatusCharaMenu; // キャラステータス（HPバーとか）のパネル
     public GameObject talkTextBox; 
-
-
     private bool isMenuActive = false;
 
     void Start()
     {
         //SetAllMenuFalse();
         SetOneMenuActive(StatusCharaMenu);
+        //InputSystemManager.Initialize(inputActions);
+        //InputSystemManager.SwitchActionMap("Menu");
     }
 
     #region // プレイヤーを取得
@@ -50,10 +53,6 @@ public class MenuUI : MonoBehaviour
 
     void Update()
     {
-        if (InputManager.instance.GetKeyDown(KeyCode.R)) // キーでメニューを開閉
-        {
-            ToggleMenu();
-        }
     }
 
     #region // メニューの開閉のメソッドたち
@@ -73,6 +72,7 @@ public class MenuUI : MonoBehaviour
     {
         SetAllMenuFalse();
         menuGameObject.SetActive(true);
+        //cursorNavigationManager.SetActiveMenu(menuGameObject);
     }
 
     public void ToggleMenu() //メインメニューのオンオフ交代
@@ -87,31 +87,56 @@ public class MenuUI : MonoBehaviour
         {
             InvalidateKey();
             statusTextManager.UpdateText();
+            cursorNavigationManager.SetActiveMenu(MainMenuButtonPanel);
             uiManager.plsyerLevelText.enabled = false;
             Time.timeScale = 0; // ゲームを一時停止
             //statusTextManager.UpdateText();
+            //InputSystemManager.SwitchActionMap("Menu");
         }
         else // メニューを開いているときに押したら全部閉じてゲームに戻る
         {
+            if (InputSystemManager.GetCurrentActionMapName == "EquipPanel")
+            {
+                foreach (Transform child in EquipPanel)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+            
             SetAllMenuFalse();
             Time.timeScale = 1; // ゲームを再開 
             uiManager.plsyerLevelText.enabled = true;
             StatusCharaMenu.SetActive(true);
             ValidateKey();
+            //InputSystemManager.SwitchActionMap("Gameplay");      
         }
+    }
+
+    public void ToMainMenu()
+    {
+        MainMenu.SetActive(isMenuActive);
+        //talkTextBox.SetActive(isMenuActive);
+        charaStatusMenu.SetActive(isMenuActive);
+        StatusCharaMenu.SetActive(!isMenuActive);
+        statusTextManager.UpdateText();
+        cursorNavigationManager.SetActiveMenu(MainMenuButtonPanel);
+        uiManager.plsyerLevelText.enabled = false;
     }
 
     public void ToEquipSelectMenu() // 武器やスキルの装備を選択するメニューを開く
     {
         Debug.Log("ToEquipSelectMenu");
         SetOneMenuActive(MainMenu);
-        EquipSelectMenu.SetActive(true);
+        //SetOneMenuActive(EquipSelectMenu);
+        //EquipSelectMenu.SetActive(true);
+        cursorNavigationManager.SetActiveMenu(EquipSelectMenu);
     }
 
     public void ToSkillTreeMenu() // スキルツリーメニューを開く
     {
         SetOneMenuActive(MainMenu);
         SkillUnlockMenu.SetActive(true);
+        cursorNavigationManager.SetActiveMenu(SkillUnlockMenu);
         //SetOneMenuActive(SkillUnlockMenu);
         // スキルツリー内のボタンは事前に配置されていて、それらボタンが押された時の処理も
         // SkillTreeButtonスクリプトに書いてあるのでここはメニューを開くだけで大丈夫
@@ -126,6 +151,7 @@ public class MenuUI : MonoBehaviour
         if (equipMenu != null)
         {
             equipMenu.UpdateBallMenu();
+            cursorNavigationManager.SetActiveMenu(EquipPanelMenu);
         }
         else
         {
@@ -142,6 +168,7 @@ public class MenuUI : MonoBehaviour
         if (equipMenu != null)
         {
             equipMenu.UpdateWeaponMenu();
+            cursorNavigationManager.SetActiveMenu(EquipPanelMenu);
         }
         else
         {
@@ -158,6 +185,7 @@ public class MenuUI : MonoBehaviour
         if (equipMenu != null)
         {
             equipMenu.UpdateSkillMenu<HealSkill>();
+            cursorNavigationManager.SetActiveMenu(EquipPanelMenu);
         }
         else
         {
@@ -174,6 +202,7 @@ public class MenuUI : MonoBehaviour
         if (equipMenu != null)
         {
             equipMenu.UpdateSkillMenu<PassiveSkill>();
+            cursorNavigationManager.SetActiveMenu(EquipPanelMenu);
         }
         else
         {
@@ -184,6 +213,7 @@ public class MenuUI : MonoBehaviour
     public void BackToMenu()
     {
         SetOneMenuActive(MainMenu);
+        cursorNavigationManager.SetActiveMenu(MainMenu);
     }
 
     private void InvalidateKey()

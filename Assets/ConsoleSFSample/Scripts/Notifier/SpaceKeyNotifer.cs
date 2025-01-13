@@ -11,7 +11,7 @@ namespace ConsoleSFSample
     /// <summary>
     /// Provides notifiers that trigger the next/cancellation instruction when the enter key is pressed.
     /// </summary>
-	public class IKeyNotifier : INextNotifier, ICancellationNotifier
+	public class SpaceKeyNotifier : INextNotifier, ICancellationNotifier
     {
         public bool OnRead(InputAction.CallbackContext context)
         {
@@ -36,12 +36,7 @@ namespace ConsoleSFSample
         {
             return UniTaskAsyncEnumerable
                 .EveryUpdate()
-                //.Select(_ => InputManager.instance.GetKeyDown(KeyCode.I))
-                //.Select(_ => Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame && InputSystemManager.GetCurrentActionMapName == "Talk")
-                .Select(_ =>
-                (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame) || // コントローラのボタン
-                (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.enterKey.wasPressedThisFrame))   // キーボードのスペースキー
-                && InputSystemManager.GetCurrentActionMapName == "Talk")
+                .Select(_ => Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && InputSystemManager.GetCurrentActionMapName == "Talk")
                 .Where(x => x)
                 .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         }

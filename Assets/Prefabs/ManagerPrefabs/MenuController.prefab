@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3956470946886376513}
   - component: {fileID: 1625881099671579872}
   - component: {fileID: 2261319446831960582}
+  - component: {fileID: 9017097414092769954}
+  - component: {fileID: 694426180237008028}
   m_Layer: 0
   m_Name: MenuController
   m_TagString: WeaponUI
@@ -31,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1625881099671579872
 MonoBehaviour:
@@ -46,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 3701790035453519363, guid: 1dd067c8b09ec6245b4f5b1983a02fac, type: 3}
-  uiManager: {fileID: 3189986145835764676, guid: ec47a53bde3aff9409102e558ae2d19d, type: 3}
+  uiManager: {fileID: 0}
   statusTextManager: {fileID: 0}
   MainMenu: {fileID: 0}
   charaStatusMenu: {fileID: 0}
@@ -68,14 +70,148 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 3701790035453519363, guid: 1dd067c8b09ec6245b4f5b1983a02fac, type: 3}
-  ballButtonPrefab: {fileID: 9083909885638743523, guid: 1cfb18eb8f51c6243b9adecd86779432, type: 3}
+  buttonDscriptionText: {fileID: 0}
+  ballButtonPrefab: {fileID: 3166226274616774912, guid: b7096d161d39683478e91c8aea272f1a, type: 3}
+  weaponButtonPrefab: {fileID: 3166226274616774912, guid: b7096d161d39683478e91c8aea272f1a, type: 3}
+  skillButtonPrefab: {fileID: 3166226274616774912, guid: b7096d161d39683478e91c8aea272f1a, type: 3}
   ballButtonContainer: {fileID: 0}
-  weaponButtonPrefab: {fileID: 9083909885638743523, guid: 1cfb18eb8f51c6243b9adecd86779432, type: 3}
   weaponButtonContainer: {fileID: 0}
-  skillButtonPrefab: {fileID: 9083909885638743523, guid: 1cfb18eb8f51c6243b9adecd86779432, type: 3}
   skillButtonContainer: {fileID: 0}
-  buttonPrefab: {fileID: 0}
-  buttonContainer: {fileID: 0}
-  EquipSelectMenu: {fileID: 0}
-  HealEquipMenu: {fileID: 0}
-  SkillUnlockMenu: {fileID: 0}
+--- !u!114 &9017097414092769954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1765529280814426218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: dc6627dc1ea0e7d44bf950a21a54637b, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: bc3ee23b-3e0d-4c65-8290-cc8304fc2cc5
+    m_ActionName: Gameplay/Move[/XInputControllerWindows/leftStick,/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9d76adc7-1035-41de-bd77-cf2e7787145f
+    m_ActionName: Gameplay/Jump[/XInputControllerWindows/rightShoulder,/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: ac10afb6-b791-43b3-801c-b16d00cb017b
+    m_ActionName: Gameplay/Ball[/XInputControllerWindows/leftShoulder]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 41f549b9-54cc-4109-8160-de37648c7aed
+    m_ActionName: Gameplay/ActiveSkill(Weapon)[/XInputControllerWindows/leftTrigger]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1625881099671579872}
+        m_TargetAssemblyTypeName: MenuUI, Assembly-CSharp
+        m_MethodName: OnMenuToggle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 4953d31f-1e99-4ace-87dd-586b0e026834
+    m_ActionName: Gameplay/ToggleMenu[/XInputControllerWindows/buttonWest]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 62446b98-7f5d-4d7f-aec9-b244be7cea88
+    m_ActionName: Gameplay/Interact[/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c5006b83-7b5a-43b4-8e57-91a2eb1546eb
+    m_ActionName: Gameplay/CharaToggle[/XInputControllerWindows/buttonNorth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3ff069ed-e5a6-4251-ad0a-a97ed1134ebd
+    m_ActionName: Gameplay/Save[/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f76c0096-95a1-467e-b616-ed05d33df054
+    m_ActionName: Gameplay/FireAngle[/XInputControllerWindows/rightStick]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6ffafc18-f1fb-4a94-8d40-31c32f9fdb6c
+    m_ActionName: Menu/ToggleMenu[/XInputControllerWindows/buttonWest]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: bd7b948a-a0fc-4066-a993-aa1c919f4696
+    m_ActionName: Talk/New action
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 73747c8e-0ed7-43e1-abb3-3a7337969f22
+    m_ActionName: TalkSelect/New action
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1765529280814426218}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 640aa5e4-19dc-42c8-a6fa-fbf13c66ed9c
+    m_ActionName: Menu/New action
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1765529280814426218}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: f9958c8e-4d73-4b32-bd4b-e5eb480fe18b
+    m_ActionName: Menu/New action
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &694426180237008028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1765529280814426218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f79aac9320001e41a896841879ece94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialMenu: {fileID: 0}
+  currentMenu: {fileID: 0}
+  inputActions: {fileID: -944628639613478452, guid: dc6627dc1ea0e7d44bf950a21a54637b, type: 3}
+  cursorPositionText: {fileID: 0}

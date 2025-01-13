@@ -12,13 +12,10 @@ public class CreatePlayer : MonoBehaviour
 
     private void Start()
     {
-        GameObject player = PlayerManager.Instance.GetOrCreatePlayer(spawnPointforPlayer, startRotation);
-        PlayerManager.Instance.LoadPlayerState();
+        //GameObject player = PlayerManager.Instance.GetOrCreatePlayer(spawnPointforPlayer, startRotation);
+        //PlayerManager.Instance.LoadPlayerState();
+        PlayerManager.Instance.InitializeWithPlayer(spawnPointforPlayer, startRotation);
 
-        if (virtualCamera != null)
-        {
-            //virtualCamera.Follow = player.transform;
-        }
     }
 
 }

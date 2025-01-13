@@ -48,6 +48,7 @@ public class EquipMenu : MonoBehaviour
         foreach (Transform child in ballButtonContainer)
         {
             Destroy(child.gameObject);
+            Debug.Log("ボタン削除");
         }
 
         // インベントリ内の各武器についてボタンを生成

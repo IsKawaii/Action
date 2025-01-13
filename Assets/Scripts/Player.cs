@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
  
 public class Player : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class Player : MonoBehaviour
     public float dashSpeed, dashLimitTime; //ダッシュ可能時間、スタミナ
     public float xmoveDistance = 0.5f, ymoveDistance = 0.5f; // 崖登りの時の移動量
     public AnimationCurve moveCurve, dashCurve, jumpCurve;
-    public float basedAttack = 10;
+    public float basedAttack = 10, damegeCorrection = 1;
     public int maxHealth = 100, maxMP = 100;
     [HideInInspector] public int currentHealth, currentMP; 
     public int HPup = 3, MPup = 3, basedAttackup = 1; // レベルアップで上がるHP・MP・基礎攻撃力
@@ -127,6 +128,14 @@ public class Player : MonoBehaviour
     private Transform originalParent, dontDestroyParent; // 元の親オブジェクトとDontDestroyOnLoad管理の親オブジェクト
     private SlideObject slideObj;
 
+    private Vector2 movePadInput, AdjustFireAngle; // 移動入力を保存するための変数
+    private float jumpInput, skillAttackInput;
+    private bool interactInput, charaToggleInput; 
+    private float verticalInput;
+    public InputActionAsset inputActions;
+    public MenuUI menuUI;
+    public CursorNavigationManager cursorNavigationManager;
+
     #endregion
 
     private void Awake()
@@ -142,6 +151,9 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
+        InputSystemManager.Initialize(inputActions);
+        //InputSystemManager.SwitchActionMap("Gameplay");
+        //InputSystemManager.SwitchActionMap("Menu");
         if (SceneManager.GetActiveScene().name == "RandomScene") // ホームシーン以外ならステージ生成
         {
             GameObject stageGeneratorobj = GameObject.Find("StageGenerator"); 
@@ -172,6 +184,9 @@ public class Player : MonoBehaviour
         tmpspeed = speed; // 移動速度を保持
 
         shooter = GetComponent<PlayerShooter>(); //ボールの発射スクリプトを取得
+        GameObject menuController = GameObject.Find("MenuController");
+        menuUI = menuController.GetComponent<MenuUI>();
+        cursorNavigationManager = menuController.GetComponent<CursorNavigationManager>();
 
         if (equippedWeapon == null) // 初期武器を装備し、インベントリに追加
         {
@@ -197,6 +212,95 @@ public class Player : MonoBehaviour
         Debug.Log("初期化");
     }
 
+
+    #region // コントローラーのインプット
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        movePadInput = context.ReadValue<Vector2>(); // Vector2で移動方向を取得
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        jumpInput = context.ReadValue<float>();
+    }
+
+    public void OnBall(InputAction.CallbackContext context) // 弾の発射処理
+    {
+        if (context.started) // ボタンが押された瞬間
+        {
+            shooter.StartCharging();
+        }
+        else if (context.performed) // ボタンが長押しされている間
+        {
+            if (!isCharging)
+            {
+                isCharging = true;
+                shooter.ContinueCharging(Time.deltaTime);
+            }
+        }
+        else if (context.canceled) // ボタンが離された瞬間
+        {
+            isCharging = false;
+            Vector2 ballDirection = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+            shooter.Fire(ballDirection);
+        }
+    }
+
+    public void onAdjustFireAngle(InputAction.CallbackContext context) // 球等の発射角度調整
+    {
+        if (context.performed) // 入力が行われている間
+        {
+            AdjustFireAngle = context.ReadValue<Vector2>();
+            verticalInput = AdjustFireAngle.y; // 上下方向の入力値を取得
+        }
+        else if (context.canceled) // 入力が停止したとき
+        {
+            verticalInput = 0f; // 値をリセット
+        }
+    }
+
+    public void OnskillAttack(InputAction.CallbackContext context)
+    {
+        skillAttackInput = context.ReadValue<float>();
+    }
+
+    public void OnMenuToggle(InputAction.CallbackContext context)
+    {
+        if (context.performed) 
+        {
+            if (InputSystemManager.GetCurrentActionMapName == "Gameplay")
+            {
+                menuUI.ToggleMenu();
+                InputSystemManager.SwitchActionMap("Menu");
+                cursorNavigationManager.InitializeButtonLists();
+            }
+        }        
+    }
+
+    public void OnSave(InputAction.CallbackContext context)
+    {
+        if (InputSystemManager.GetCurrentActionMapName != "Gameplay")
+            return;
+        
+        if (context.performed) 
+        {
+            Debug.Log("InputSystemManager.GetCurrentActionMapName" + InputSystemManager.GetCurrentActionMapName);
+            SavePosition();
+        }        
+    }
+
+    public void OnRespawn(InputAction.CallbackContext context)
+    {
+        if (InputSystemManager.GetCurrentActionMapName != "Gameplay")
+            return;
+        
+        if (context.performed) 
+        {
+            Respawn();
+        }        
+    }
+    #endregion
+
     void Start()
     {
         //Initialize();
@@ -206,8 +310,14 @@ public class Player : MonoBehaviour
     {
         //UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
         //UIMagicBar.instance.SetValue(currentMP / (float)maxMP);
+        if (skillAttackInput > 0 && !isAttacking) // Qキーを押し続けると攻撃を発射
+        {
+            StartCoroutine(Attack());
+        }
 
-        if (InputManager.instance.GetKeyDown(KeyCode.E) && !isinMenu) // Eキーを押したときにセーブポイントを設定
+        /*
+        //if (InputManager.instance.GetKeyDown(KeyCode.E) && !isinMenu) // Eキーを押したときにセーブポイントを設定
+        if (InputManager.instance.GetKeyDown(KeyCode.E) && !isinMenu)
         {
             SavePosition();
         }
@@ -217,7 +327,7 @@ public class Player : MonoBehaviour
             Toggle(); 
         }
 
-        if (InputManager.instance.GetKeyDown(KeyCode.O)) // セーブポイントにワープ
+        if (InputManager.instance.GetKeyDown(KeyCode.O) && !isinMenu) // セーブポイントにワープ
         {
             Respawn();
         }
@@ -226,6 +336,7 @@ public class Player : MonoBehaviour
         {
             StartCoroutine(Attack());
         }
+        */
 
         #region // タイマー関連
         if (isInvincible) // 無敵状態のタイマーを更新
@@ -288,6 +399,16 @@ public class Player : MonoBehaviour
             {
                 shooter.RequestAngleAdjustment(-1);
             }
+        }
+
+        if (verticalInput > 0)
+        {
+            shooter.RequestAngleAdjustment(1);
+        }
+        else if (verticalInput < 0)
+        {
+            Debug.Log(verticalInput);
+            shooter.RequestAngleAdjustment(-1);
         }
 
         if (InputManager.instance.GetKeyUp(KeyCode.K)) // 発射キーを離したときに発射
@@ -422,34 +543,31 @@ public class Player : MonoBehaviour
 
         if (isInputDisabled) return; // 入力が無効の場合、何もしない
 
-        //キー入力されたら行動する
-        float horizontalKey = Input.GetAxis("Horizontal");
         float verticalKey = Input.GetAxis("Vertical");
-        float jumpKey = Input.GetAxis("Jump"); 
         float yJumpSpeed= 0.0f;
         bool isFall = false;
 
         #region//横移動
-        if ((transform.localScale.x > 0 && horizontalKey < 0) || (transform.localScale.x < 0 && horizontalKey > 0))
+        if ((transform.localScale.x > 0 && movePadInput.x < 0) || (transform.localScale.x < 0 && movePadInput.x > 0))
         {
             shooter.flipAngle();
         }
 
-        if (horizontalKey > 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x < 0)) // 天井のとき 未使用
+        if (movePadInput.x > 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x < 0)) // 天井のとき 未使用
         {
             xmoveTime += Time.deltaTime;
             xSpeed = speed;
             ishorizontalmove = true;
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey < 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x > 0)) // 天井のとき 未使用
+        else if (movePadInput.x < 0 && isStickingCeiling && (isFrontCeiling || transform.localScale.x > 0)) // 天井のとき 未使用
         {
             xmoveTime += Time.deltaTime;    
             xSpeed = -speed;
             ishorizontalmove = true;
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey > 0 && (isFrontGround || isBackGround || isFrontCeiling || isBackCeiling)) // 床や天井のとき
+        else if (movePadInput.x > 0 && (isFrontGround || isBackGround || isFrontCeiling || isBackCeiling)) // 床や天井のとき
         {
             isWalking = true;
             //anim.SetBool("walk", true);
@@ -459,7 +577,7 @@ public class Player : MonoBehaviour
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey < 0 && (isFrontGround || isBackGround || isFrontCeiling || isBackCeiling)) // 床や天井のとき
+        else if (movePadInput.x < 0 && (isFrontGround || isBackGround || isFrontCeiling || isBackCeiling)) // 床や天井のとき
         {   
             isWalking = true;
             //anim.SetBool("walk", true);    
@@ -469,7 +587,7 @@ public class Player : MonoBehaviour
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey > 0 && (isUpperWall || isBottomWall) && transform.localScale.x <0) // 壁のとき 未使用
+        else if (movePadInput.x > 0 && (isUpperWall || isBottomWall) && transform.localScale.x <0) // 壁のとき 未使用
         {
             //anim.SetBool("walk", true);
             xmoveTime += Time.deltaTime;
@@ -478,7 +596,7 @@ public class Player : MonoBehaviour
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey < 0 && (isUpperWall || isBottomWall) && transform.localScale.x > 0) // 壁のとき 未使用
+        else if (movePadInput.x < 0 && (isUpperWall || isBottomWall) && transform.localScale.x > 0) // 壁のとき 未使用
         {       
             //anim.SetBool("walk", true);
             xmoveTime += Time.deltaTime;    
@@ -487,7 +605,7 @@ public class Player : MonoBehaviour
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey > 0 && !isFrontGround && !isBackGround && !isFrontCeiling && !isBackCeiling && !isUpperWall && !isBottomWall) // 空中のとき
+        else if (movePadInput.x > 0 && !isFrontGround && !isBackGround && !isFrontCeiling && !isBackCeiling && !isUpperWall && !isBottomWall) // 空中のとき
         {
             //anim.SetBool("walk", true);
             //WalkParticle.Stop();
@@ -497,7 +615,7 @@ public class Player : MonoBehaviour
             // 進行方向に応じてキャラクターを反転
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        else if (horizontalKey < 0 && !isFrontGround && !isBackGround && !isFrontCeiling && !isBackCeiling && !isUpperWall && !isBottomWall) // 空中のとき
+        else if (movePadInput.x < 0 && !isFrontGround && !isBackGround && !isFrontCeiling && !isBackCeiling && !isUpperWall && !isBottomWall) // 空中のとき
         {       
             //anim.SetBool("walk", true);
             //WalkParticle.Stop();
@@ -517,8 +635,9 @@ public class Player : MonoBehaviour
             xmoveTime = 0.0f;
         }
 
-        float moveInput = Input.GetAxis("Horizontal");
-        isWalking = Mathf.Abs(moveInput) > 0.01f; // 少しでも入力があれば移動と判定
+        //float moveInput = Input.GetAxis("Horizontal");
+        //isWalking = Mathf.Abs(moveInput) > 0.01f; // 少しでも入力があれば移動と判定
+        isWalking = Mathf.Abs(movePadInput.x) > 0.01f;
         // 移動し始める瞬間
         if (isWalking && !wasWalking)
         {
@@ -532,14 +651,14 @@ public class Player : MonoBehaviour
         
 
         //方向転換したら加速し直す
-        if (horizontalKey > 0 && beforehorizontalKey < 0)
+        if (movePadInput.x > 0 && beforehorizontalKey < 0)
         {
             WalkParticle.Stop();
             WalkParticle.Clear();
             WalkParticle.Play();
             xmoveTime = 0.0f;
         }
-        else if (horizontalKey < 0 && beforehorizontalKey > 0)
+        else if (movePadInput.x < 0 && beforehorizontalKey > 0)
         {
             WalkParticle.Stop();
             WalkParticle.Clear();
@@ -547,7 +666,7 @@ public class Player : MonoBehaviour
             xmoveTime = 0.0f;
         }
 
-        beforehorizontalKey = horizontalKey;
+        beforehorizontalKey = movePadInput.x;
 
         // 現在の状態を保存
         wasWalking = isWalking;
@@ -627,7 +746,7 @@ public class Player : MonoBehaviour
         if(isFrontGround || isBackGround)
         {
             //if (InputManager.instance.GetKeyDown(KeyCode.Space) && canJump)
-            if (jumpKey > 0 && canJump)
+            if (jumpInput > 0 && canJump)
             {
                 yJumpSpeed = jumpSpeed;
                 jumpPos = transform.position.y; //ジャンプした位置を記録する
@@ -643,7 +762,7 @@ public class Player : MonoBehaviour
         else if(isJump)
         {
             //上方向キーを押しているか
-            bool pushUpKey = jumpKey > 0;
+            bool pushUpKey = jumpInput > 0;
             //現在の高さが飛べる高さより下か
             bool canHeight = jumpPos + jumpHeight > transform.position.y;
             //ジャンプ時間が長くなりすぎてないか
@@ -674,14 +793,12 @@ public class Player : MonoBehaviour
 
         if (isMinJump)
         {
-            Debug.Log("isMinJump");
             jumpTime += Time.deltaTime;
             //yJumpSpeed *= jumpCurve.Evaluate(jumpTime);
             if (transform.position.y >= jumpPos + minJumpHeight)
             {
                 isMinJump = false;
                 isJump = false;
-                Debug.Log("isMinJump");
             }
         }
 
@@ -710,7 +827,7 @@ public class Player : MonoBehaviour
         
         if (xSpeed != 0.0f)
         {   
-            if (transform.localScale.x > 0 && (isUpperWall || isBottomWall) && (xSpeed > 0.0f || horizontalKey > 0.0f))
+            if (transform.localScale.x > 0 && (isUpperWall || isBottomWall) && (xSpeed > 0.0f || movePadInput.x > 0.0f))
             {
                 xSpeed = 0.0f;
             }
@@ -908,7 +1025,8 @@ public class Player : MonoBehaviour
 
     private IEnumerator Attack() // 処理の一部を装備時（EquipWeapon）に移したい
     {
-        while (InputManager.instance.GetKey(KeyCode.Q) && !isinMenu)
+        //while (InputManager.instance.GetKey(KeyCode.Q) && !isinMenu)
+        while (skillAttackInput > 0 && !isinMenu)
         {
             isAttacking = true;
 
@@ -1435,7 +1553,8 @@ public class Player : MonoBehaviour
         // 無敵状態でなければダメージを受ける
         if (!isInvincible)
         {
-            currentHealth -= damage;
+            int correctedDamage = Mathf.RoundToInt(damage * damegeCorrection);
+            currentHealth -= correctedDamage;
             UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
 
             rb.velocity = Vector2.zero; // 既存の速度をリセット
@@ -1443,7 +1562,7 @@ public class Player : MonoBehaviour
 
             GameObject damageText = Instantiate(damageTextPrefab, damageTextPosition.position, Quaternion.identity);
             DamageText DamageTextScript = damageText.GetComponent<DamageText>();
-            DamageTextScript.Setup(-damage);
+            DamageTextScript.Setup(-correctedDamage);
 
             audioSource.PlayOneShot(damageSE);
 

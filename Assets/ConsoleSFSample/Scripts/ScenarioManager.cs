@@ -42,11 +42,13 @@ namespace ConsoleSFSample
             //Build ScenarioBookReader ------
             //EnterKeyNotifier enterKeyNotifier = new EnterKeyNotifier();
             IKeyNotifier iKeyNotifier = new IKeyNotifier();
+            //SpaceKeyNotifier spaceKeyNotifier = new SpaceKeyNotifier();
 
             //INextNotifier nextNotifier = enterKeyNotifier;
             INextNotifier nextNotifier = iKeyNotifier;
-            //ICancellationNotifier cancellationNotifier = enterKeyNotifier;
+            //INextNotifier nextNotifier = spaceKeyNotifier;
 
+            //ICancellationNotifier cancellationNotifier = enterKeyNotifier;
             MouseNotifier mouseNotifier = new MouseNotifier();
 
             //INextNotifier nextNotifier = mouseNotifier;

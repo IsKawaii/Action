@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8295661920938759530}
   - component: {fileID: 3837434274829062221}
   - component: {fileID: 6276338644497942641}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: GroundCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 5415466897195766035}
   - component: {fileID: 2643663452874827759}
   - component: {fileID: 7071234843268393225}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: CeilingCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 3145141772279886559}
   - component: {fileID: 4061194167520327916}
   - component: {fileID: 9015014351735903805}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Enemy002_ShieldMendako
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -388,7 +388,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7741864549445738751}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -421,7 +421,7 @@ GameObject:
   - component: {fileID: 7041743638320717281}
   - component: {fileID: 7954868138346318741}
   - component: {fileID: 2312830446510831094}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: WallCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -510,7 +510,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6454541897702627553}
   - component: {fileID: 6252375974482105197}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}

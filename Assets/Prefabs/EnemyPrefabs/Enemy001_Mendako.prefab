@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2146522552783340135}
   - component: {fileID: 4371461947900332573}
   - component: {fileID: 3479433256889572733}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Enemy001_Mendako
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -180,6 +180,8 @@ MonoBehaviour:
   dropRate: 0.5
   xpValue: 100
   dieEffectPrefab: {fileID: 5179392818484210512, guid: 8666030397052cb4ab3cad9756e85f85, type: 3}
+  damageTextPrefab: {fileID: 0}
+  damageTextPosition: {fileID: 0}
 --- !u!114 &3479433256889572733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,7 +208,7 @@ GameObject:
   - component: {fileID: 1047620982495491174}
   - component: {fileID: 7975974841078025722}
   - component: {fileID: 1478310476251365899}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: WallCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -296,7 +298,7 @@ GameObject:
   - component: {fileID: 8919562850175206954}
   - component: {fileID: 5486501153695403056}
   - component: {fileID: 4445849010622892427}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: CeilingCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -386,7 +388,7 @@ GameObject:
   - component: {fileID: 8106303190122898931}
   - component: {fileID: 7198918630112613379}
   - component: {fileID: 55034023477041749}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: GroundCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}

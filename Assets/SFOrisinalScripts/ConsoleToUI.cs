@@ -61,6 +61,7 @@ public class ConsoleToUI : MonoBehaviour
             
             if (characterNameStart != -1 && characterNameEnd != -1)
             {
+                InputSystemManager.SwitchActionMap("Talk");
                 InvalidateKey(); // テキスト進行キー以外を無効化
                 if (menuPanel.gameObject.activeSelf == true)
                 {
@@ -147,13 +148,14 @@ public class ConsoleToUI : MonoBehaviour
         {
             menuPanel.SetActive(true);
             isMenuToTalk = false;
+            InputSystemManager.SwitchActionMap("Menu");
         }
         else
         {
            StatusCharaMenu.SetActive(true);
            Time.timeScale = 1;
+           InputSystemManager.SwitchActionMap("Gameplay");
         } 
-
         ValidateKey();
     }
 

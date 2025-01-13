@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2611625243943187714}
   - component: {fileID: 4573610289212868208}
   - component: {fileID: 8496262568371476291}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Enemy003_Shell
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -141,6 +141,8 @@ MonoBehaviour:
   dropRate: 0.5
   xpValue: 50
   dieEffectPrefab: {fileID: 5179392818484210512, guid: 8666030397052cb4ab3cad9756e85f85, type: 3}
+  damageTextPrefab: {fileID: 0}
+  damageTextPosition: {fileID: 0}
 --- !u!114 &8496262568371476291
 MonoBehaviour:
   m_ObjectHideFlags: 0

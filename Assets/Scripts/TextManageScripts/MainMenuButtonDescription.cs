@@ -10,11 +10,21 @@ public class MainMenuButtonDescription : MonoBehaviour, IPointerEnterHandler, IP
     public string dscriptionText;
     public void OnPointerEnter(PointerEventData eventData)
     {
-        buttonDscription.text = dscriptionText;
+        //buttonDscription.text = dscriptionText;
     }
 
     // マウスカーソルがボタンから出た時に呼ばれる
     public void OnPointerExit(PointerEventData eventData)
+    {
+        //buttonDscription.text = "";
+    }
+
+    public void DisplayDscriptionText()
+    {
+        buttonDscription.text = dscriptionText;
+    }
+
+    public void DelateDscriptionText()
     {
         buttonDscription.text = "";
     }

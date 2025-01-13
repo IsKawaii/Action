@@ -30,4 +30,14 @@ public class EquipButtonDescription : MonoBehaviour, IPointerEnterHandler, IPoin
     {
         buttonDscription.text = "";
     }
+
+    public void DisplayDscriptionText()
+    {
+        buttonDscription.text = dscriptionText;
+    }
+
+    public void DelateDscriptionText()
+    {
+        buttonDscription.text = "";
+    }
 }
